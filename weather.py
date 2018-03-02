@@ -1,13 +1,14 @@
 # Fetch weather info from WUnderground and/or local station, process, and return
 from urllib.request import urlopen
 import json
+import os
 
 PWS_ID = 'KCALIVER107' # Wunderground Personal Weather Station ID
 MOCK_WUNDERGROUND_DATA = False
 
 def _request_data(api_key, pws_id):
     if MOCK_WUNDERGROUND_DATA:
-        with open('mock_wunderground_data.json') as mock_data:
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mock_wunderground_data.json')) as mock_data:
             json_string = mock_data.read()
     else:
         query_url = 'http://api.wunderground.com/api/{api_key}/conditions/forecast/q/pws:{pws_id}.json'.format(api_key=api_key, pws_id=pws_id)
@@ -17,7 +18,7 @@ def _request_data(api_key, pws_id):
     return parsed_json['current_observation'], parsed_json['forecast']['simpleforecast']['forecastday']
 
 def _wunderground_data():
-    with open('wunderground.key') as key_file:
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wunderground.key')) as key_file:
         api_key = key_file.read().strip()
 
     current, forecasts = _request_data(api_key, PWS_ID)
