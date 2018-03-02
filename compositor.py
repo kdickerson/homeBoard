@@ -27,24 +27,27 @@ def create(weather, calendar, special_event):
     draw.text(((COLUMN_WIDTH-dimensions[0])/2, 0), 'Current', font=header_font, fill=BLACK)
     draw.text((0, 40), str(weather['current']['temperature']) + ' F', font=body_font, fill=BLACK)
     draw.text((0, 65), str(weather['current']['wind']) + ' MPH', font=body_font, fill=BLACK)
+    draw.text((0, 90), weather['current']['description'], font=body_font, fill=BLACK)
     if weather['current']['icon']:
-        image.paste(weather['current']['icon'], (0, 90))
+        image.paste(weather['current']['icon'], (0, 115))
 
     # Center Column
     dimensions = draw.textsize('Today', font=header_font)
     draw.text(((COLUMN_WIDTH-dimensions[0])/2 + 213, 0), 'Today', font=header_font, fill=BLACK)
     draw.text((213, 40), 'High: ' + str(weather['forecast']['today']['high-temperature']) + ' F', font=body_font, fill=BLACK)
     draw.text((213, 65), 'Low: ' + str(weather['forecast']['today']['low-temperature']) + ' F', font=body_font, fill=BLACK)
+    draw.text((213, 90), weather['forecast']['today']['description'], font=body_font, fill=BLACK)
     if weather['forecast']['today']['icon']:
-        image.paste(weather['forecast']['today']['icon'], (250, 90))
+        image.paste(weather['forecast']['today']['icon'], (250, 115))
 
     # Right Column
     dimensions = draw.textsize('Tomorrow', font=header_font)
     draw.text(((COLUMN_WIDTH-dimensions[0])/2 + 427, 0), 'Tomorrow', font=header_font, fill=BLACK)
     draw.text((427, 40), 'High: ' + str(weather['forecast']['tomorrow']['high-temperature']) + ' F', font=body_font, fill=BLACK)
     draw.text((427, 65), 'Low: ' + str(weather['forecast']['tomorrow']['low-temperature']) + ' F', font=body_font, fill=BLACK)
+    draw.text((427, 90), weather['forecast']['tomorrow']['description'], font=body_font, fill=BLACK)
     if weather['forecast']['tomorrow']['icon']:
-        image.paste(weather['forecast']['tomorrow']['icon'], (475, 90))
+        image.paste(weather['forecast']['tomorrow']['icon'], (475, 115))
 
     if (special_event):
         draw.text((0, 300), special_event['name'], font=header_font, fill=RED)
