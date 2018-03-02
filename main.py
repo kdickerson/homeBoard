@@ -3,6 +3,7 @@ import calendar
 import special_events
 import compositor
 import datetime
+import sys
 
 def make_image(when):
     conditions = weather.fetch(when)
@@ -19,10 +20,17 @@ def display_image():
     epd.display_frame(epd.get_frame_buffer(image))
 
 def save_image():
-    when = datetime.datetime(2018, 3, 17, 17, 16)
+    #when = datetime.datetime(2018, 3, 17, 17, 16)
+    when = datetime.datetime.now()
     image = make_image(when)
     image.save('composite.bmp')
 
+'''
+    Save image rather than send to display (for quick testing of design changes):
+    python main.py save
+'''
 if __name__ == '__main__':
-    display_image()
-    #save_image()
+    if len(sys.argv) > 1 and sys.argv[1] == 'save':
+        save_image()
+    else:
+        display_image()

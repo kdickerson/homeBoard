@@ -8,25 +8,43 @@ WHITE = 255
 RED = 128
 
 # TODO: Generate subroutines to fill in subsections by size, then composite those sections back together
-# Which should allow me to much more easily align things to edges
+#       Which should allow me to much more easily align things to edges and distribute whitespace
 
 def create(weather, calendar, special_event):
     image = Image.new('L', (EPD_WIDTH, EPD_HEIGHT), WHITE)    # 255: clear the frame
     draw = ImageDraw.Draw(image)
     header_font = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf', 36)
     body_font = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf', 24)
+    detail_font = ImageFont.truetype('/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf', 14)
 
-    draw.text((0, 10), 'Current', font=header_font, fill=BLACK)
-    draw.text((0, 100), str(weather['current']['temperature']) + ' F', font=body_font, fill=BLACK)
-    draw.text((0, 150), str(weather['current']['wind']) + ' MPH', font=body_font, fill=BLACK)
+    # Bottom-right corner
+    dimensions = draw.textsize(weather['current']['time'], font=detail_font)
+    draw.text((EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1]), weather['current']['time'], font=detail_font, fill=BLACK)
 
-    draw.text((250, 10), 'Today', font=header_font, fill=BLACK)
-    draw.text((250, 100), 'High: ' + str(weather['forecast']['today']['high-temperature']) + ' F', font=body_font, fill=BLACK)
-    draw.text((250, 150), 'Low: ' + str(weather['forecast']['today']['low-temperature']) + ' F', font=body_font, fill=BLACK)
+    COLUMN_WIDTH = 213
+    # Left Column
+    dimensions = draw.textsize('Current', font=header_font)
+    draw.text(((COLUMN_WIDTH-dimensions[0])/2, 0), 'Current', font=header_font, fill=BLACK)
+    draw.text((0, 40), str(weather['current']['temperature']) + ' F', font=body_font, fill=BLACK)
+    draw.text((0, 65), str(weather['current']['wind']) + ' MPH', font=body_font, fill=BLACK)
+    if weather['current']['icon']:
+        image.paste(weather['current']['icon'], (0, 90))
 
-    draw.text((475, 10), 'Tomorrow', font=header_font, fill=BLACK)
-    draw.text((475, 100), 'High: ' + str(weather['forecast']['tomorrow']['high-temperature']) + ' F', font=body_font, fill=BLACK)
-    draw.text((475, 150), 'Low: ' + str(weather['forecast']['tomorrow']['low-temperature']) + ' F', font=body_font, fill=BLACK)
+    # Center Column
+    dimensions = draw.textsize('Today', font=header_font)
+    draw.text(((COLUMN_WIDTH-dimensions[0])/2 + 213, 0), 'Today', font=header_font, fill=BLACK)
+    draw.text((213, 40), 'High: ' + str(weather['forecast']['today']['high-temperature']) + ' F', font=body_font, fill=BLACK)
+    draw.text((213, 65), 'Low: ' + str(weather['forecast']['today']['low-temperature']) + ' F', font=body_font, fill=BLACK)
+    if weather['forecast']['today']['icon']:
+        image.paste(weather['forecast']['today']['icon'], (250, 90))
+
+    # Right Column
+    dimensions = draw.textsize('Tomorrow', font=header_font)
+    draw.text(((COLUMN_WIDTH-dimensions[0])/2 + 427, 0), 'Tomorrow', font=header_font, fill=BLACK)
+    draw.text((427, 40), 'High: ' + str(weather['forecast']['tomorrow']['high-temperature']) + ' F', font=body_font, fill=BLACK)
+    draw.text((427, 65), 'Low: ' + str(weather['forecast']['tomorrow']['low-temperature']) + ' F', font=body_font, fill=BLACK)
+    if weather['forecast']['tomorrow']['icon']:
+        image.paste(weather['forecast']['tomorrow']['icon'], (475, 90))
 
     if (special_event):
         draw.text((0, 300), special_event['name'], font=header_font, fill=RED)
