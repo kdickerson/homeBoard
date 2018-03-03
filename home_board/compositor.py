@@ -10,8 +10,8 @@ WHITE = 255
 RED = 128
 
 COLUMN_WIDTH = 160
-# TODO: Generate subroutines to fill in subsections by size, then composite those sections back together
-#       Which should allow me to much more easily align things to edges and distribute whitespace
+CALENDAR_TOP = 130
+CALENDAR_BOTTOM = 305
 
 WEATHER_ICON_MAP = {
     'chanceflurries': 'chancesnow.bmp',
@@ -51,6 +51,24 @@ def _load_event_icon(icon):
 def _centered_text(draw, text, font, width, offset):
     dimensions = draw.textsize(text, font=font)
     return ((width - dimensions[0]) // 2 + offset[0], offset[1])
+
+def _truncate_text(draw, text, font, width):
+    dimensions = draw.textsize(text, font=font)
+    i = 0
+    while dimensions[0] > width:
+        i = i - 1
+        dimensions = draw.textsize(text[:i], font=font)
+    return text[:i] if i < 0 else text, dimensions
+
+def _calendar_draw_day(image, draw, events, offset, font):
+    padding = 10
+    top = offset[1]
+    for event in events:
+        text, dimensions = _truncate_text(draw, event['start'].strftime('%H:%M') + ' ' + event['description'], font, COLUMN_WIDTH - padding)
+        if top + dimensions[1] > CALENDAR_BOTTOM:
+            break
+        draw.text((offset[0], top), text, font=font, fill=BLACK)
+        top = top + dimensions[1] + padding
 
 def _weather_draw_today(image, draw, conditions, forecast, header_font, temp_font):
     draw.text(_centered_text(draw, 'Today', header_font, COLUMN_WIDTH, (0, 0)), 'Today', font=header_font, fill=BLACK)
@@ -117,6 +135,7 @@ def create(weather, calendar, special_event):
     header_font = ImageFont.truetype(local_file('fonts/FreeSansBold.ttf'), 36)
     special_font = header_font
     temp_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 24)
+    calendar_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 20)
     footer_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 14)
 
     # Footer: Bottom-right corner
@@ -126,15 +145,19 @@ def create(weather, calendar, special_event):
 
     # 1st Column
     _weather_draw_today(image, draw, weather['current'], weather['forecast']['today'], header_font, temp_font)
+    _calendar_draw_day(image, draw, calendar['today'], (0, CALENDAR_TOP), calendar_font)
 
     # 2nd Column
     _weather_draw_forecast(image, draw, COLUMN_WIDTH, weather['forecast']['plus_one']['weekday'], weather['forecast']['plus_one'], header_font, temp_font)
+    _calendar_draw_day(image, draw, calendar['plus_one'], (COLUMN_WIDTH, CALENDAR_TOP), calendar_font)
 
     # 3rd Column
     _weather_draw_forecast(image, draw, COLUMN_WIDTH*2, weather['forecast']['plus_two']['weekday'], weather['forecast']['plus_two'], header_font, temp_font)
+    _calendar_draw_day(image, draw, calendar['plus_two'], (COLUMN_WIDTH*2, CALENDAR_TOP), calendar_font)
 
     # 4th Column
     _weather_draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['plus_three']['weekday'], weather['forecast']['plus_three'], header_font, temp_font)
+    _calendar_draw_day(image, draw, calendar['plus_three'], (COLUMN_WIDTH*3, CALENDAR_TOP), calendar_font)
 
     if (special_event):
         _special_event_draw(image, draw, special_event, timestamp_height, special_font)
