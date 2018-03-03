@@ -12,7 +12,7 @@ COLUMN_WIDTH = 160
 # TODO: Generate subroutines to fill in subsections by size, then composite those sections back together
 #       Which should allow me to much more easily align things to edges and distribute whitespace
 
-ICON_MAP = {
+WEATHER_ICON_MAP = {
     'chanceflurries': 'chancesnow.bmp',
     'chancerain': 'chancerain.bmp',
     'chancesleet': 'chancesnow.bmp',
@@ -34,8 +34,8 @@ ICON_MAP = {
     'unknown': 'sunny.bmp',
 }
 
-def _load_icon(icon):
-    return Image.open(local_file('icons/weather/' + ICON_MAP[icon])) # Expecting 64x64 monochrome icons
+def _load_weather_icon(icon):
+    return Image.open(local_file('icons/weather/' + WEATHER_ICON_MAP[icon])) # Expecting 64x64 monochrome icons
 
 def _centered_text(draw, text, font, width, offset):
     dimensions = draw.textsize(text, font=font)
@@ -46,7 +46,7 @@ def _draw_forecast(image, draw, column_left, header, forecast, header_font, body
     msg = str(forecast['low-temperature']) + '–' + str(forecast['high-temperature']) # Center before adding the °
     draw.text(_centered_text(draw, msg, body_font, COLUMN_WIDTH, (column_left, 40)), msg  + '°', font=body_font, fill=BLACK)
     try:
-        icon = _load_icon(forecast['icon'])
+        icon = _load_weather_icon(forecast['icon'])
         image.paste(icon, ((COLUMN_WIDTH - icon.size[0]) // 2 + column_left, 65))
     except:
         draw.text(_centered_text(draw, forecast['description'], body_font, COLUMN_WIDTH, (column_left, 65)), forecast['description'], font=body_font, fill=BLACK)
@@ -70,7 +70,7 @@ def create(weather, calendar, special_event):
     msg = str(weather['current']['temperature']) # Center before adding the °
     draw.text(_centered_text(draw, msg, body_font, COLUMN_WIDTH, (0, 40)), msg + '°', font=body_font, fill=BLACK)
     try:
-        icon = _load_icon(weather['current']['icon'])
+        icon = _load_weather_icon(weather['current']['icon'])
         image.paste(icon, ((COLUMN_WIDTH - icon.size[0]) // 2, 65))
     except:
         draw.text(_centered_text(draw, weather['current']['description'], body_font, COLUMN_WIDTH, (0, 65)), weather['current']['description'], font=body_font, fill=BLACK)
