@@ -48,10 +48,35 @@ def _centered_text(draw, text, font, width, offset):
     dimensions = draw.textsize(text, font=font)
     return ((width - dimensions[0]) // 2 + offset[0], offset[1])
 
+def _draw_today(image, draw, conditions, forecast, header_font, body_font, detail_font):
+    draw.text(_centered_text(draw, 'Today', header_font, COLUMN_WIDTH, (0, 0)), 'Today', font=header_font, fill=BLACK)
+    SUB_COLUMN_WIDTH = COLUMN_WIDTH // 2
+
+    # Sub column 1:
+    cur_size = draw.textsize(str(conditions['temperature']), font=body_font)
+    draw.text(_centered_text(draw, str(conditions['temperature']), body_font, SUB_COLUMN_WIDTH, (0, 40)), str(conditions['temperature']) + '°', font=body_font, fill=BLACK)
+
+    # Sub column 2:
+    forecast_msg = str(forecast['low-temperature']) + '–' + str(forecast['high-temperature'])
+    forecast_size = draw.textsize(forecast_msg, font=detail_font)
+    detail_offset = cur_size[1] - forecast_size[1]
+    draw.text(_centered_text(draw, forecast_msg, detail_font, SUB_COLUMN_WIDTH, (SUB_COLUMN_WIDTH, 40 + detail_offset)), forecast_msg + '°', font=detail_font, fill=BLACK)
+
+    try:
+        cur_icon = _load_weather_icon(conditions['icon'])
+        forecast_icon = _load_weather_icon(forecast['icon'])
+        image.paste(cur_icon, ((SUB_COLUMN_WIDTH - cur_icon.size[0]) // 2, 65))
+        image.paste(forecast_icon, ((SUB_COLUMN_WIDTH - cur_icon.size[0]) // 2 + SUB_COLUMN_WIDTH, 65))
+    except:
+        draw.text(_centered_text(draw, conditions['description'], body_font, COLUMN_WIDTH, (0, 65)), conditions['description'], font=body_font, fill=BLACK)
+
+    separator = '⇝'
+    draw.text(_centered_text(draw, separator, body_font, COLUMN_WIDTH, (0, 55)), separator, font=body_font, fill=BLACK)
+
 def _draw_forecast(image, draw, column_left, header, forecast, header_font, body_font):
     draw.text(_centered_text(draw, header, header_font, COLUMN_WIDTH, (column_left, 0)), header, font=header_font, fill=BLACK)
     msg = str(forecast['low-temperature']) + '–' + str(forecast['high-temperature']) # Center before adding the °
-    draw.text(_centered_text(draw, msg, body_font, COLUMN_WIDTH, (column_left, 40)), msg  + '°', font=body_font, fill=BLACK)
+    draw.text(_centered_text(draw, msg, body_font, COLUMN_WIDTH, (column_left, 40)), msg + '°', font=body_font, fill=BLACK)
     try:
         icon = _load_weather_icon(forecast['icon'])
         image.paste(icon, ((COLUMN_WIDTH - icon.size[0]) // 2 + column_left, 65))
@@ -89,30 +114,22 @@ def create(weather, calendar, special_event):
     body_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 24)
     detail_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 14)
 
-    # Bottom-right corner
+    # Footer: Bottom-right corner
     dimensions = draw.textsize(weather['current']['time'], font=detail_font)
     timestamp_height = dimensions[1]
     draw.text((EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1]), weather['current']['time'], font=detail_font, fill=BLACK)
 
     # 1st Column
-    msg = 'Current'
-    draw.text(_centered_text(draw, msg, header_font, COLUMN_WIDTH, (0, 0)), msg, font=header_font, fill=BLACK)
-    msg = str(weather['current']['temperature']) # Center before adding the °
-    draw.text(_centered_text(draw, msg, body_font, COLUMN_WIDTH, (0, 40)), msg + '°', font=body_font, fill=BLACK)
-    try:
-        icon = _load_weather_icon(weather['current']['icon'])
-        image.paste(icon, ((COLUMN_WIDTH - icon.size[0]) // 2, 65))
-    except:
-        draw.text(_centered_text(draw, weather['current']['description'], body_font, COLUMN_WIDTH, (0, 65)), weather['current']['description'], font=body_font, fill=BLACK)
+    _draw_today(image, draw, weather['current'], weather['forecast']['today'], header_font, body_font, detail_font)
 
     # 2nd Column
-    _draw_forecast(image, draw, COLUMN_WIDTH, 'Today', weather['forecast']['today'], header_font, body_font)
+    _draw_forecast(image, draw, COLUMN_WIDTH, weather['forecast']['plus_one']['weekday'], weather['forecast']['plus_one'], header_font, body_font)
 
     # 3rd Column
-    _draw_forecast(image, draw, COLUMN_WIDTH*2, weather['forecast']['tomorrow']['weekday'], weather['forecast']['tomorrow'], header_font, body_font)
+    _draw_forecast(image, draw, COLUMN_WIDTH*2, weather['forecast']['plus_two']['weekday'], weather['forecast']['plus_two'], header_font, body_font)
 
     # 4th Column
-    _draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['day_after']['weekday'], weather['forecast']['day_after'], header_font, body_font)
+    _draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['plus_three']['weekday'], weather['forecast']['plus_three'], header_font, body_font)
 
     if (special_event):
         _draw_special_event(image, draw, special_event, timestamp_height, header_font)

@@ -37,19 +37,26 @@ def _wunderground_data():
             'icon': forecasts[0]['icon'],
             'weekday': forecasts[0]['date']['weekday_short']
         },
-        'tomorrow': {
+        'plus_one': {
             'low-temperature': forecasts[1]['low']['fahrenheit'],
             'high-temperature': forecasts[1]['high']['fahrenheit'],
             'description': forecasts[1]['conditions'],
             'icon': forecasts[1]['icon'],
             'weekday': forecasts[1]['date']['weekday_short']
         },
-        'day_after': {
+        'plus_two': {
             'low-temperature': forecasts[2]['low']['fahrenheit'],
             'high-temperature': forecasts[2]['high']['fahrenheit'],
             'description': forecasts[2]['conditions'],
             'icon': forecasts[2]['icon'],
             'weekday': forecasts[2]['date']['weekday_short']
+        },
+        'plus_three': {
+            'low-temperature': forecasts[3]['low']['fahrenheit'],
+            'high-temperature': forecasts[3]['high']['fahrenheit'],
+            'description': forecasts[3]['conditions'],
+            'icon': forecasts[3]['icon'],
+            'weekday': forecasts[3]['date']['weekday_short']
         }
     }
     return cleaned_current, cleaned_forecast
