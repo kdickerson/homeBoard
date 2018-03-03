@@ -1,5 +1,5 @@
-import weather
-import calendar
+import weather_underground as weather
+import google_calendar as calendar
 import special_events
 import compositor
 import datetime
@@ -7,9 +7,9 @@ import sys
 
 def make_image(when):
     conditions = weather.fetch(when)
-    calendering = calendar.fetch(when)
+    calender_events = calendar.fetch(when)
     special_event = special_events.fetch(when)
-    return compositor.create(conditions, calendering, special_event)
+    return compositor.create(conditions, calender_events, special_event)
 
 def display_image():
     import epd7in5b
