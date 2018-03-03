@@ -4,7 +4,7 @@ import json
 from util import local_file
 
 PWS_ID = 'KCALIVER107' # Wunderground Personal Weather Station ID
-MOCK_WUNDERGROUND_DATA = True
+MOCK_WUNDERGROUND_DATA = False
 
 def _request_data(api_key, pws_id):
     if MOCK_WUNDERGROUND_DATA:
