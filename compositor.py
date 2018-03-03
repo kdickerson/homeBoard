@@ -34,8 +34,15 @@ WEATHER_ICON_MAP = {
     'unknown': 'sunny.bmp',
 }
 
+EVENT_ICON_MAP = {
+    'birthday': 'birthday.bmp',
+}
+
 def _load_weather_icon(icon):
     return Image.open(local_file('icons/weather/' + WEATHER_ICON_MAP[icon])) # Expecting 64x64 monochrome icons
+
+def _load_event_icon(icon):
+    return Image.open(local_file('icons/events/' + EVENT_ICON_MAP[icon]))
 
 def _centered_text(draw, text, font, width, offset):
     dimensions = draw.textsize(text, font=font)
@@ -50,6 +57,29 @@ def _draw_forecast(image, draw, column_left, header, forecast, header_font, body
         image.paste(icon, ((COLUMN_WIDTH - icon.size[0]) // 2 + column_left, 65))
     except:
         draw.text(_centered_text(draw, forecast['description'], body_font, COLUMN_WIDTH, (column_left, 65)), forecast['description'], font=body_font, fill=BLACK)
+
+def _draw_special_event(image, draw, event, offset_bottom, font):
+    textsize = draw.textsize(event['msg'], font=font)
+    iconsize = [0, 0]
+    icon = None
+    try:
+        icon = _load_event_icon(event['icon']) if event['icon'] else None
+        if icon:
+            iconsize = icon.size
+    except:
+        raise
+
+    if icon:
+        padding = 5
+        msgsize = (iconsize[0] + textsize[0] + padding, max(textsize[1], iconsize[1]))
+    else:
+        padding = 0
+        msgsize = textsize
+
+    left = (EPD_WIDTH - msgsize[0]) // 2
+    top = EPD_HEIGHT - msgsize[1] - offset_bottom
+    image.paste(icon, (left, top + (msgsize[1] - iconsize[1]) // 2)) if icon else None
+    draw.text((left + iconsize[0] + padding, top + (msgsize[1] - textsize[1]) // 2), event['msg'], font=font, fill=RED)
 
 def create(weather, calendar, special_event):
     image = Image.new('L', (EPD_WIDTH, EPD_HEIGHT), WHITE)    # 255: clear the frame
@@ -85,7 +115,6 @@ def create(weather, calendar, special_event):
     _draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['day_after']['weekday'], weather['forecast']['day_after'], header_font, body_font)
 
     if (special_event):
-        dimensions = draw.textsize(special_event['msg'], font=header_font)
-        draw.text(((EPD_WIDTH - dimensions[0]) // 2, EPD_HEIGHT - dimensions[1] - timestamp_height), special_event['msg'], font=header_font, fill=RED)
+        _draw_special_event(image, draw, special_event, timestamp_height, header_font)
 
     return image

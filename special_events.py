@@ -2,7 +2,7 @@
 import datetime
 
 EVENTS = [
-    {'month': 3, 'day': 17, 'msg': 'Happy Birthday Corinne!'}
+    {'month': 3, 'day': 17, 'msg': 'Happy Birthday, Corinne!', 'icon': 'birthday'}
 ]
 
 def fetch(when):
