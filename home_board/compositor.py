@@ -1,6 +1,7 @@
 # Generate in image from the provided weather, calendar, special_events data
 from PIL import Image, ImageDraw, ImageFont
-from util import local_file
+from .util import local_file
+import os
 
 EPD_WIDTH = 640
 EPD_HEIGHT = 384
@@ -38,11 +39,14 @@ EVENT_ICON_MAP = {
     'birthday': 'birthday.bmp',
 }
 
+WEATHER_ICON_PATH = '../icons/weather/'
+EVENTS_ICON_PATH = '../icons/events/'
+
 def _load_weather_icon(icon):
-    return Image.open(local_file('icons/weather/' + WEATHER_ICON_MAP[icon])) # Expecting 64x64 monochrome icons
+    return Image.open(local_file(os.path.join(WEATHER_ICON_PATH, WEATHER_ICON_MAP[icon]))) # Expecting 64x64 monochrome icons
 
 def _load_event_icon(icon):
-    return Image.open(local_file('icons/events/' + EVENT_ICON_MAP[icon]))
+    return Image.open(local_file(os.path.join(EVENTS_ICON_PATH, EVENT_ICON_MAP[icon])))
 
 def _centered_text(draw, text, font, width, offset):
     dimensions = draw.textsize(text, font=font)

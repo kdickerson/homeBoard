@@ -5,7 +5,7 @@ import dateutil.parser
 import httplib2
 import os
 import pytz
-from util import local_file
+from .util import local_file
 
 from apiclient import discovery
 from oauth2client import client
@@ -15,12 +15,12 @@ from oauth2client.file import Storage
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/calendar-python-quickstart.json
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
-CLIENT_SECRET_FILE = 'google_calendar.key'
-CREDENTIALS_FILE = 'google_calendar_credentials.key'
+CLIENT_SECRET_FILE = '../private/google_calendar.key'
+CREDENTIALS_FILE = '../private/google_calendar_credentials.key'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 TIME_ZONE = "America/Los_Angeles"
-MOCK_GOOGLE_CALENDAR_DATA = True
-MOCK_GOOGLE_CALENDAR_DATA_FILE = 'mock_google_calendar_data.py.txt'
+MOCK_GOOGLE_CALENDAR_DATA = False
+MOCK_GOOGLE_CALENDAR_DATA_FILE = '../mock_data/mock_google_calendar_data.py.txt'
 
 def _get_credentials_store():
     credential_path = local_file(CREDENTIALS_FILE)

@@ -1,7 +1,4 @@
-import weather_underground as weather
-import google_calendar as calendar
-import special_events
-import compositor
+from home_board import weather, calendar, special_events, compositor
 import datetime
 import sys
 
@@ -12,7 +9,7 @@ def make_image():
     return compositor.create(conditions, calender_events, special_event)
 
 def display_image():
-    import epd7in5b
+    from waveshare import epd7in5b
     epd = epd7in5b.EPD()
     epd.init()
     image = make_image()

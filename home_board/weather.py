@@ -1,12 +1,12 @@
 # Fetch weather info from WUnderground and/or local station, process, and return
 from urllib.request import urlopen
 import json
-from util import local_file
+from .util import local_file
 
-CLIENT_SECRET_FILE = 'wunderground.key'
+CLIENT_SECRET_FILE = '../private/wunderground.key'
 PWS_ID = 'KCALIVER107' # Wunderground Personal Weather Station ID
 MOCK_WUNDERGROUND_DATA = False
-MOCK_WUNDERGROUND_DATA_FILE = 'mock_wunderground_data.json'
+MOCK_WUNDERGROUND_DATA_FILE = '../mock_data/mock_wunderground_data.json'
 
 def _request_data(api_key, pws_id):
     if MOCK_WUNDERGROUND_DATA:
