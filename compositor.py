@@ -8,7 +8,7 @@ BLACK = 0
 WHITE = 255
 RED = 128
 
-COLUMN_WIDTH = 213
+COLUMN_WIDTH = 160
 # TODO: Generate subroutines to fill in subsections by size, then composite those sections back together
 #       Which should allow me to much more easily align things to edges and distribute whitespace
 
@@ -64,7 +64,7 @@ def create(weather, calendar, special_event):
     timestamp_height = dimensions[1]
     draw.text((EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1]), weather['current']['time'], font=detail_font, fill=BLACK)
 
-    # Left Column
+    # 1st Column
     msg = 'Current'
     draw.text(_centered_text(draw, msg, header_font, COLUMN_WIDTH, (0, 0)), msg, font=header_font, fill=BLACK)
     msg = str(weather['current']['temperature']) # Center before adding the °
@@ -75,11 +75,14 @@ def create(weather, calendar, special_event):
     except:
         draw.text(_centered_text(draw, weather['current']['description'], body_font, COLUMN_WIDTH, (0, 65)), weather['current']['description'], font=body_font, fill=BLACK)
 
-    # Center Column
+    # 2nd Column
     _draw_forecast(image, draw, COLUMN_WIDTH, 'Today', weather['forecast']['today'], header_font, body_font)
 
-    # Right Column
-    _draw_forecast(image, draw, COLUMN_WIDTH*2, 'Tomorrow', weather['forecast']['tomorrow'], header_font, body_font)
+    # 3rd Column
+    _draw_forecast(image, draw, COLUMN_WIDTH*2, weather['forecast']['tomorrow']['weekday'], weather['forecast']['tomorrow'], header_font, body_font)
+
+    # 4th Column
+    _draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['day_after']['weekday'], weather['forecast']['day_after'], header_font, body_font)
 
     if (special_event):
         dimensions = draw.textsize(special_event['msg'], font=header_font)
