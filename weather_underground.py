@@ -3,12 +3,14 @@ from urllib.request import urlopen
 import json
 from util import local_file
 
+CLIENT_SECRET_FILE = 'wunderground.key'
 PWS_ID = 'KCALIVER107' # Wunderground Personal Weather Station ID
 MOCK_WUNDERGROUND_DATA = False
+MOCK_WUNDERGROUND_DATA_FILE = 'mock_wunderground_data.json'
 
 def _request_data(api_key, pws_id):
     if MOCK_WUNDERGROUND_DATA:
-        with open(local_file('mock_wunderground_data.json')) as mock_data:
+        with open(local_file(MOCK_WUNDERGROUND_DATA_FILE)) as mock_data:
             json_string = mock_data.read()
     else:
         query_url = 'http://api.wunderground.com/api/{api_key}/conditions/forecast/q/pws:{pws_id}.json'.format(api_key=api_key, pws_id=pws_id)
@@ -18,7 +20,7 @@ def _request_data(api_key, pws_id):
     return parsed_json['current_observation'], parsed_json['forecast']['simpleforecast']['forecastday']
 
 def _wunderground_data():
-    with open(local_file('wunderground.key')) as key_file:
+    with open(local_file(CLIENT_SECRET_FILE)) as key_file:
         api_key = key_file.read().strip()
 
     current, forecasts = _request_data(api_key, PWS_ID)
