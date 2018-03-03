@@ -35,7 +35,7 @@ ICON_MAP = {
 }
 
 def _load_icon(icon):
-    return Image.open(local_file('icons/' + ICON_MAP[icon])) # Expecting 64x64 monochrome icons
+    return Image.open(local_file('icons/weather/' + ICON_MAP[icon])) # Expecting 64x64 monochrome icons
 
 def _centered_text(draw, text, font, width, offset):
     dimensions = draw.textsize(text, font=font)
