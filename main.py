@@ -5,24 +5,21 @@ import compositor
 import datetime
 import sys
 
-def make_image(when):
-    conditions = weather.fetch(when)
-    calender_events = calendar.fetch(when)
-    special_event = special_events.fetch(when)
+def make_image():
+    conditions = weather.fetch()
+    calender_events = calendar.fetch()
+    special_event = special_events.fetch()
     return compositor.create(conditions, calender_events, special_event)
 
 def display_image():
     import epd7in5b
     epd = epd7in5b.EPD()
     epd.init()
-    now = datetime.datetime.now()
-    image = make_image(now)
+    image = make_image()
     epd.display_frame(epd.get_frame_buffer(image))
 
 def save_image():
-    #when = datetime.datetime(2018, 3, 17, 17, 16)
-    when = datetime.datetime.now()
-    image = make_image(when)
+    image = make_image()
     image.save('composite.bmp')
 
 '''

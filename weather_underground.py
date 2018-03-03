@@ -61,7 +61,7 @@ def _wunderground_data():
     }
     return cleaned_current, cleaned_forecast
 
-def fetch(when):
+def fetch():
     current, forecast = _wunderground_data()
     return {
         'current': current,
