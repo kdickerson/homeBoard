@@ -1,14 +1,14 @@
 # Fetch weather info from WUnderground and/or local station, process, and return
 from urllib.request import urlopen
 import json
-import os
+from util import local_file
 
 PWS_ID = 'KCALIVER107' # Wunderground Personal Weather Station ID
 MOCK_WUNDERGROUND_DATA = False
 
 def _request_data(api_key, pws_id):
     if MOCK_WUNDERGROUND_DATA:
-        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'mock_wunderground_data.json')) as mock_data:
+        with open(local_file('mock_wunderground_data.json')) as mock_data:
             json_string = mock_data.read()
     else:
         query_url = 'http://api.wunderground.com/api/{api_key}/conditions/forecast/q/pws:{pws_id}.json'.format(api_key=api_key, pws_id=pws_id)
@@ -18,7 +18,7 @@ def _request_data(api_key, pws_id):
     return parsed_json['current_observation'], parsed_json['forecast']['simpleforecast']['forecastday']
 
 def _wunderground_data():
-    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'wunderground.key')) as key_file:
+    with open(local_file('wunderground.key')) as key_file:
         api_key = key_file.read().strip()
 
     current, forecasts = _request_data(api_key, PWS_ID)
@@ -27,20 +27,20 @@ def _wunderground_data():
         'temperature': current['temp_f'],
         'wind': current['wind_mph'],
         'description': current['weather'],
-        'icon': None # TODO
+        'icon': current['icon']
     }
     cleaned_forecast = {
         'today': {
             'low-temperature': forecasts[0]['low']['fahrenheit'],
             'high-temperature': forecasts[0]['high']['fahrenheit'],
             'description': forecasts[0]['conditions'],
-            'icon': None # TODO
+            'icon': forecasts[0]['icon']
         },
         'tomorrow': {
             'low-temperature': forecasts[1]['low']['fahrenheit'],
             'high-temperature': forecasts[1]['high']['fahrenheit'],
             'description': forecasts[1]['conditions'],
-            'icon': None # TODO
+            'icon': forecasts[1]['icon']
         }
     }
     return cleaned_current, cleaned_forecast
