@@ -2,7 +2,7 @@
 
 A set of scripts to compile "agenda" data and display it on a Waveshare ePaper display (7.5 inch, 3 color).
 
-Written for Python3
+Written for Python3, utilizes pipenv.
 
 Pulls weather conditions and forecasting from [Weather Underground (API Key required)](https://www.wunderground.com/weather/api/).
 

@@ -15,6 +15,9 @@ setuptools = "*"
 spidev = "*"
 "rpi.gpio" = "*"
 pillow = "*"
+google-api-python-client = "*"
+pytz = "*"
+python-dateutil = "*"
 
 
 [requires]
