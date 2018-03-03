@@ -48,7 +48,7 @@ def _centered_text(draw, text, font, width, offset):
     dimensions = draw.textsize(text, font=font)
     return ((width - dimensions[0]) // 2 + offset[0], offset[1])
 
-def _draw_today(image, draw, conditions, forecast, header_font, body_font, detail_font):
+def _draw_today(image, draw, conditions, forecast, header_font, body_font):
     draw.text(_centered_text(draw, 'Today', header_font, COLUMN_WIDTH, (0, 0)), 'Today', font=header_font, fill=BLACK)
     SUB_COLUMN_WIDTH = COLUMN_WIDTH // 2
 
@@ -57,10 +57,10 @@ def _draw_today(image, draw, conditions, forecast, header_font, body_font, detai
     draw.text(_centered_text(draw, str(conditions['temperature']), body_font, SUB_COLUMN_WIDTH, (0, 40)), str(conditions['temperature']) + '°', font=body_font, fill=BLACK)
 
     # Sub column 2:
-    forecast_msg = str(forecast['low-temperature']) + '–' + str(forecast['high-temperature'])
-    forecast_size = draw.textsize(forecast_msg, font=detail_font)
+    forecast_msg = str(forecast['high-temperature'])
+    forecast_size = draw.textsize(forecast_msg, font=body_font)
     detail_offset = cur_size[1] - forecast_size[1]
-    draw.text(_centered_text(draw, forecast_msg, detail_font, SUB_COLUMN_WIDTH, (SUB_COLUMN_WIDTH, 40 + detail_offset)), forecast_msg + '°', font=detail_font, fill=BLACK)
+    draw.text(_centered_text(draw, forecast_msg, body_font, SUB_COLUMN_WIDTH, (SUB_COLUMN_WIDTH, 40 + detail_offset)), forecast_msg + '°', font=body_font, fill=BLACK)
 
     try:
         cur_icon = _load_weather_icon(conditions['icon'])
@@ -120,7 +120,7 @@ def create(weather, calendar, special_event):
     draw.text((EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1]), weather['current']['time'], font=detail_font, fill=BLACK)
 
     # 1st Column
-    _draw_today(image, draw, weather['current'], weather['forecast']['today'], header_font, body_font, detail_font)
+    _draw_today(image, draw, weather['current'], weather['forecast']['today'], header_font, body_font)
 
     # 2nd Column
     _draw_forecast(image, draw, COLUMN_WIDTH, weather['forecast']['plus_one']['weekday'], weather['forecast']['plus_one'], header_font, body_font)
