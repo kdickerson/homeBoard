@@ -4,4 +4,4 @@ A set of scripts to compile "agenda" data and display it on a Waveshare ePaper d
 
 Written for Python3
 
-Icons from flaticons.net
+Original icons from flaticons.net and then modified.
