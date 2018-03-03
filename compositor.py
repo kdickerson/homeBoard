@@ -43,8 +43,8 @@ def _centered_text(draw, text, font, width, offset):
 
 def _draw_forecast(image, draw, column_left, header, forecast, header_font, body_font):
     draw.text(_centered_text(draw, header, header_font, COLUMN_WIDTH, (column_left, 0)), header, font=header_font, fill=BLACK)
-    msg = str(forecast['low-temperature']) + '–' + str(forecast['high-temperature']) + '°'
-    draw.text(_centered_text(draw, msg, body_font, COLUMN_WIDTH, (column_left, 40)), msg, font=body_font, fill=BLACK)
+    msg = str(forecast['low-temperature']) + '–' + str(forecast['high-temperature']) # Center before adding the °
+    draw.text(_centered_text(draw, msg, body_font, COLUMN_WIDTH, (column_left, 40)), msg  + '°', font=body_font, fill=BLACK)
     try:
         icon = _load_icon(forecast['icon'])
         image.paste(icon, ((COLUMN_WIDTH - icon.size[0]) // 2 + column_left, 65))
@@ -67,8 +67,8 @@ def create(weather, calendar, special_event):
     # Left Column
     msg = 'Current'
     draw.text(_centered_text(draw, msg, header_font, COLUMN_WIDTH, (0, 0)), msg, font=header_font, fill=BLACK)
-    msg = str(weather['current']['temperature']) + '°'
-    draw.text(_centered_text(draw, msg, body_font, COLUMN_WIDTH, (0, 40)), msg, font=body_font, fill=BLACK)
+    msg = str(weather['current']['temperature']) # Center before adding the °
+    draw.text(_centered_text(draw, msg, body_font, COLUMN_WIDTH, (0, 40)), msg + '°', font=body_font, fill=BLACK)
     try:
         icon = _load_icon(weather['current']['icon'])
         image.paste(icon, ((COLUMN_WIDTH - icon.size[0]) // 2, 65))
