@@ -52,19 +52,19 @@ def _centered_text(draw, text, font, width, offset):
     dimensions = draw.textsize(text, font=font)
     return ((width - dimensions[0]) // 2 + offset[0], offset[1])
 
-def _draw_today(image, draw, conditions, forecast, header_font, body_font):
+def _weather_draw_today(image, draw, conditions, forecast, header_font, temp_font):
     draw.text(_centered_text(draw, 'Today', header_font, COLUMN_WIDTH, (0, 0)), 'Today', font=header_font, fill=BLACK)
     SUB_COLUMN_WIDTH = COLUMN_WIDTH // 2
 
     # Sub column 1:
-    cur_size = draw.textsize(str(conditions['temperature']), font=body_font)
-    draw.text(_centered_text(draw, str(conditions['temperature']), body_font, SUB_COLUMN_WIDTH, (0, 40)), str(conditions['temperature']) + '°', font=body_font, fill=BLACK)
+    cur_size = draw.textsize(str(conditions['temperature']), font=temp_font)
+    draw.text(_centered_text(draw, str(conditions['temperature']), temp_font, SUB_COLUMN_WIDTH, (0, 40)), str(conditions['temperature']) + '°', font=temp_font, fill=BLACK)
 
     # Sub column 2:
     forecast_msg = str(forecast['high-temperature'])
-    forecast_size = draw.textsize(forecast_msg, font=body_font)
+    forecast_size = draw.textsize(forecast_msg, font=temp_font)
     detail_offset = cur_size[1] - forecast_size[1]
-    draw.text(_centered_text(draw, forecast_msg, body_font, SUB_COLUMN_WIDTH, (SUB_COLUMN_WIDTH, 40 + detail_offset)), forecast_msg + '°', font=body_font, fill=BLACK)
+    draw.text(_centered_text(draw, forecast_msg, temp_font, SUB_COLUMN_WIDTH, (SUB_COLUMN_WIDTH, 40 + detail_offset)), forecast_msg + '°', font=temp_font, fill=BLACK)
 
     try:
         cur_icon = _load_weather_icon(conditions['icon'])
@@ -72,22 +72,22 @@ def _draw_today(image, draw, conditions, forecast, header_font, body_font):
         image.paste(cur_icon, ((SUB_COLUMN_WIDTH - cur_icon.size[0]) // 2, 65))
         image.paste(forecast_icon, ((SUB_COLUMN_WIDTH - cur_icon.size[0]) // 2 + SUB_COLUMN_WIDTH, 65))
     except:
-        draw.text(_centered_text(draw, conditions['description'], body_font, COLUMN_WIDTH, (0, 65)), conditions['description'], font=body_font, fill=BLACK)
+        draw.text(_centered_text(draw, conditions['description'], temp_font, COLUMN_WIDTH, (0, 65)), conditions['description'], font=temp_font, fill=BLACK)
 
     separator = '⇝'
-    draw.text(_centered_text(draw, separator, body_font, COLUMN_WIDTH, (0, 55)), separator, font=body_font, fill=BLACK)
+    draw.text(_centered_text(draw, separator, temp_font, COLUMN_WIDTH, (0, 55)), separator, font=temp_font, fill=BLACK)
 
-def _draw_forecast(image, draw, column_left, header, forecast, header_font, body_font):
+def _weather_draw_forecast(image, draw, column_left, header, forecast, header_font, temp_font):
     draw.text(_centered_text(draw, header, header_font, COLUMN_WIDTH, (column_left, 0)), header, font=header_font, fill=BLACK)
     msg = str(forecast['low-temperature']) + '–' + str(forecast['high-temperature']) # Center before adding the °
-    draw.text(_centered_text(draw, msg, body_font, COLUMN_WIDTH, (column_left, 40)), msg + '°', font=body_font, fill=BLACK)
+    draw.text(_centered_text(draw, msg, temp_font, COLUMN_WIDTH, (column_left, 40)), msg + '°', font=temp_font, fill=BLACK)
     try:
         icon = _load_weather_icon(forecast['icon'])
         image.paste(icon, ((COLUMN_WIDTH - icon.size[0]) // 2 + column_left, 65))
     except:
-        draw.text(_centered_text(draw, forecast['description'], body_font, COLUMN_WIDTH, (column_left, 65)), forecast['description'], font=body_font, fill=BLACK)
+        draw.text(_centered_text(draw, forecast['description'], temp_font, COLUMN_WIDTH, (column_left, 65)), forecast['description'], font=temp_font, fill=BLACK)
 
-def _draw_special_event(image, draw, event, offset_bottom, font):
+def _special_event_draw(image, draw, event, offset_bottom, font):
     textsize = draw.textsize(event['msg'], font=font)
     iconsize = [0, 0]
     icon = None
@@ -115,27 +115,28 @@ def create(weather, calendar, special_event):
     draw = ImageDraw.Draw(image)
     draw.fontmode = '1' # No Anti-aliasing
     header_font = ImageFont.truetype(local_file('fonts/FreeSansBold.ttf'), 36)
-    body_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 24)
-    detail_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 14)
+    special_font = header_font
+    temp_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 24)
+    footer_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 14)
 
     # Footer: Bottom-right corner
-    dimensions = draw.textsize(weather['current']['time'], font=detail_font)
+    dimensions = draw.textsize(weather['current']['time'], font=footer_font)
     timestamp_height = dimensions[1]
-    draw.text((EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1]), weather['current']['time'], font=detail_font, fill=BLACK)
+    draw.text((EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1]), weather['current']['time'], font=footer_font, fill=BLACK)
 
     # 1st Column
-    _draw_today(image, draw, weather['current'], weather['forecast']['today'], header_font, body_font)
+    _weather_draw_today(image, draw, weather['current'], weather['forecast']['today'], header_font, temp_font)
 
     # 2nd Column
-    _draw_forecast(image, draw, COLUMN_WIDTH, weather['forecast']['plus_one']['weekday'], weather['forecast']['plus_one'], header_font, body_font)
+    _weather_draw_forecast(image, draw, COLUMN_WIDTH, weather['forecast']['plus_one']['weekday'], weather['forecast']['plus_one'], header_font, temp_font)
 
     # 3rd Column
-    _draw_forecast(image, draw, COLUMN_WIDTH*2, weather['forecast']['plus_two']['weekday'], weather['forecast']['plus_two'], header_font, body_font)
+    _weather_draw_forecast(image, draw, COLUMN_WIDTH*2, weather['forecast']['plus_two']['weekday'], weather['forecast']['plus_two'], header_font, temp_font)
 
     # 4th Column
-    _draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['plus_three']['weekday'], weather['forecast']['plus_three'], header_font, body_font)
+    _weather_draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['plus_three']['weekday'], weather['forecast']['plus_three'], header_font, temp_font)
 
     if (special_event):
-        _draw_special_event(image, draw, special_event, timestamp_height, header_font)
+        _special_event_draw(image, draw, special_event, timestamp_height, special_font)
 
     return image
