@@ -145,27 +145,28 @@ def create(weather, calendar, special_event):
     footer_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 14)
 
     # Footer: Bottom-right corner
-    dimensions = draw.textsize(weather['current']['time'], font=footer_font)
-    timestamp_height = dimensions[1]
-    draw.text((EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1]), weather['current']['time'], font=footer_font, fill=BLACK)
+    if weather:
+        dimensions = draw.textsize(weather['current']['time'], font=footer_font)
+        timestamp_height = dimensions[1]
+        draw.text((EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1]), weather['current']['time'], font=footer_font, fill=BLACK)
 
     # 1st Column
-    _weather_draw_today(image, draw, weather['current'], weather['forecast']['today'], header_font, temp_font)
-    _calendar_draw_day(image, draw, calendar['today'], (0, CALENDAR_TOP), cal_time_font, cal_text_font)
+    if weather: _weather_draw_today(image, draw, weather['current'], weather['forecast']['today'], header_font, temp_font)
+    if calendar: _calendar_draw_day(image, draw, calendar['today'], (0, CALENDAR_TOP), cal_time_font, cal_text_font)
 
     # 2nd Column
-    _weather_draw_forecast(image, draw, COLUMN_WIDTH, weather['forecast']['plus_one']['weekday'], weather['forecast']['plus_one'], header_font, temp_font)
-    _calendar_draw_day(image, draw, calendar['plus_one'], (COLUMN_WIDTH, CALENDAR_TOP), cal_time_font, cal_text_font)
+    if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH, weather['forecast']['plus_one']['weekday'], weather['forecast']['plus_one'], header_font, temp_font)
+    if calendar: _calendar_draw_day(image, draw, calendar['plus_one'], (COLUMN_WIDTH, CALENDAR_TOP), cal_time_font, cal_text_font)
 
     # 3rd Column
-    _weather_draw_forecast(image, draw, COLUMN_WIDTH*2, weather['forecast']['plus_two']['weekday'], weather['forecast']['plus_two'], header_font, temp_font)
-    _calendar_draw_day(image, draw, calendar['plus_two'], (COLUMN_WIDTH*2, CALENDAR_TOP), cal_time_font, cal_text_font)
+    if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH*2, weather['forecast']['plus_two']['weekday'], weather['forecast']['plus_two'], header_font, temp_font)
+    if calendar: _calendar_draw_day(image, draw, calendar['plus_two'], (COLUMN_WIDTH*2, CALENDAR_TOP), cal_time_font, cal_text_font)
 
     # 4th Column
-    _weather_draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['plus_three']['weekday'], weather['forecast']['plus_three'], header_font, temp_font)
-    _calendar_draw_day(image, draw, calendar['plus_three'], (COLUMN_WIDTH*3, CALENDAR_TOP), cal_time_font, cal_text_font)
+    if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['plus_three']['weekday'], weather['forecast']['plus_three'], header_font, temp_font)
+    if calendar: _calendar_draw_day(image, draw, calendar['plus_three'], (COLUMN_WIDTH*3, CALENDAR_TOP), cal_time_font, cal_text_font)
 
-    if (special_event):
+    if special_event:
         _special_event_draw(image, draw, special_event, timestamp_height, special_font)
 
     return image
