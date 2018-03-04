@@ -63,13 +63,15 @@ def _truncate_text(draw, text, font, width):
     return (text[:i-1] + '…') if i < 0 else text, dimensions
 
 def _calendar_draw_day(image, draw, events, offset, time_font, description_font):
-    padding = 10
+    padding = 5
     top = offset[1]
-    for event in events:
+    for idx, event in enumerate(events):
         header = ('' if event['all_day'] else event['start'].strftime('%-H:%M') + ' ') + event['calendar_label'] # %-H is Linux specific
         time, time_dim = _truncate_text(draw, header, time_font, COLUMN_WIDTH - padding)
         desc, desc_dim = _truncate_text(draw, event['description'], description_font, COLUMN_WIDTH - padding - padding) # 2nd padding for left-margin
         if top + time_dim[1] + desc_dim[1] > CALENDAR_BOTTOM:
+            msg = '+' + str(len(events) - idx - 1) + ' More'
+            draw.text(_centered_text(draw, msg, description_font, COLUMN_WIDTH, (offset[0], top)), msg, font=description_font, fill=BLACK)
             break
         draw.text((offset[0], top), time, font=time_font, fill=BLACK)
         draw.text((offset[0] + padding, top + time_dim[1]), desc, font=description_font, fill=BLACK)
