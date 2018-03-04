@@ -63,14 +63,14 @@ def _truncate_text(draw, text, font, width):
         dimensions = draw.textsize(text[:i], font=font)
     return (text[:i-1] + '…') if i < 0 else text, dimensions
 
-def _calendar_draw_day(image, draw, events, offset, time_font, description_font):
+def _calendar_draw_day(image, draw, events, offset, bottom, time_font, description_font):
     padding = 5
     top = offset[1]
     for idx, event in enumerate(events):
         header = ('' if event['all_day'] else event['start'].strftime('%-H:%M') + ' ') + event['calendar_label'] # %-H is Linux specific
         time, time_dim = _truncate_text(draw, header, time_font, COLUMN_WIDTH - padding)
         desc, desc_dim = _truncate_text(draw, event['description'], description_font, COLUMN_WIDTH - padding - padding) # 2nd padding for left-margin
-        if top + time_dim[1] + desc_dim[1] > CALENDAR_BOTTOM:
+        if top + time_dim[1] + desc_dim[1] > bottom:
             msg = '+' + str(len(events) - idx - 1) + ' More'
             draw.text(_centered_text(draw, msg, description_font, COLUMN_WIDTH, (offset[0], top)), msg, font=description_font, fill=BLACK)
             break
@@ -153,21 +153,23 @@ def create(weather, calendar, special_event):
         timestamp_height = dimensions[1]
         draw.text((EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1]), weather['current']['time'], font=footer_font, fill=BLACK)
 
+    cal_bottom = CALENDAR_BOTTOM if special_event else (EPD_HEIGHT - 35) # TODO: Don't like the magic number here; fix later with real calculation
+
     # 1st Column
     if weather: _weather_draw_today(image, draw, weather['current'], weather['forecast']['today'], header_font, temp_font)
-    if calendar: _calendar_draw_day(image, draw, calendar['today'], (0, CALENDAR_TOP), cal_time_font, cal_text_font)
+    if calendar: _calendar_draw_day(image, draw, calendar['today'], (0, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     # 2nd Column
     if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH, weather['forecast']['plus_one']['weekday'], weather['forecast']['plus_one'], header_font, temp_font)
-    if calendar: _calendar_draw_day(image, draw, calendar['plus_one'], (COLUMN_WIDTH, CALENDAR_TOP), cal_time_font, cal_text_font)
+    if calendar: _calendar_draw_day(image, draw, calendar['plus_one'], (COLUMN_WIDTH, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     # 3rd Column
     if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH*2, weather['forecast']['plus_two']['weekday'], weather['forecast']['plus_two'], header_font, temp_font)
-    if calendar: _calendar_draw_day(image, draw, calendar['plus_two'], (COLUMN_WIDTH*2, CALENDAR_TOP), cal_time_font, cal_text_font)
+    if calendar: _calendar_draw_day(image, draw, calendar['plus_two'], (COLUMN_WIDTH*2, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     # 4th Column
     if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['plus_three']['weekday'], weather['forecast']['plus_three'], header_font, temp_font)
-    if calendar: _calendar_draw_day(image, draw, calendar['plus_three'], (COLUMN_WIDTH*3, CALENDAR_TOP), cal_time_font, cal_text_font)
+    if calendar: _calendar_draw_day(image, draw, calendar['plus_three'], (COLUMN_WIDTH*3, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     if special_event:
         _special_event_draw(image, draw, special_event, timestamp_height, special_font)
