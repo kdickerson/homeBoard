@@ -11,6 +11,6 @@ EVENTS = [
 ]
 
 def fetch():
-    now = datetime.date.now()
+    now = datetime.date.today()
     #now = datetime.date(2018, 12, 25)
     return next((e for e in EVENTS if now.month == e['month'] and now.day == e['day']), None)
