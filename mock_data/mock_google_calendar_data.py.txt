@@ -30,8 +30,8 @@
       'sequence': 0,
       'status': 'confirmed',
       'creator': {'email': 'kyle.dickerson@gmail.com', 'self': True, 'displayName': 'Kyle Dickerson'},
-      'start': {'dateTime': '2018-03-05T15:00:00-08:00'},
-      'end': {'dateTime': '2018-03-05T17:00:00-08:00'},
+      'start': {'date': '2018-03-05'},
+      'end': {'date': '2018-03-05'},
       'updated': '2018-03-02T19:31:56.747Z',
       'reminders': {'useDefault': True}
     },
