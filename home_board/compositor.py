@@ -60,7 +60,7 @@ def _truncate_text(draw, text, font, width):
     while dimensions[0] > width:
         i = i - 1
         dimensions = draw.textsize(text[:i], font=font)
-    return text[:i] if i < 0 else text, dimensions
+    return (text[:i-1] + '…') if i < 0 else text, dimensions
 
 def _calendar_draw_day(image, draw, events, offset, time_font, description_font):
     padding = 10

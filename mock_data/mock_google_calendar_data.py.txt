@@ -5,7 +5,7 @@
       'iCalUID': '4ei3qmvjhp7g9n7rp8nifg0q4t@google.com',
       'created': '2018-03-02T19:31:56.000Z',
       'id': '4ei3qmvjhp7g9n7rp8nifg0q4t',
-      'summary': 'Work Lunch',
+      'summary': 'Work Lunch - Too Long',
       'etag': '"3040038233494000"',
       'kind': 'calendar#event',
       'organizer': {'email': 'kyle.dickerson@gmail.com', 'self': True, 'displayName': 'Kyle Dickerson'},
