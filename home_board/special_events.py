@@ -8,9 +8,10 @@ EVENTS = [
     {'month': 10, 'day': 28, 'msg': 'Happy Birthday, Heather!', 'icon': 'birthday'},
     {'month': 10, 'day': 31, 'msg': 'Happy Halloween!', 'icon': 'halloween'},
     {'month': 12, 'day': 25, 'msg': 'Merry Christmas!', 'icon': 'christmas'},
+    {'year': 2018, 'month': 11, 'day': 22, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
 ]
 
 def fetch():
     now = datetime.date.today()
     #now = datetime.date(2018, 12, 25)
-    return next((e for e in EVENTS if now.month == e['month'] and now.day == e['day']), None)
+    return next((e for e in EVENTS if now.month is e['month'] and now.day is e['day'] and (not hasattr(e, 'year') or now.year is e['year'])), None)
