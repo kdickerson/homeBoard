@@ -71,7 +71,7 @@ def _calendar_draw_day(image, draw, events, offset, bottom, time_font, descripti
         time, time_dim = _truncate_text(draw, header, time_font, COLUMN_WIDTH - padding)
         desc, desc_dim = _truncate_text(draw, event['description'], description_font, COLUMN_WIDTH - padding - padding) # 2nd padding for left-margin
         if top + time_dim[1] + desc_dim[1] > bottom:
-            msg = '+' + str(len(events) - idx - 1) + ' More'
+            msg = '+' + str(len(events) - idx) + ' More'
             draw.text(_centered_text(draw, msg, description_font, COLUMN_WIDTH, (offset[0], top)), msg, font=description_font, fill=BLACK)
             break
         draw.text((offset[0], top), time, font=time_font, fill=BLACK)
