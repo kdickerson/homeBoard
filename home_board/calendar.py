@@ -53,7 +53,7 @@ def _get_credentials():
         raise ValueError("No valid credentials found.  Run generate_credentials manually to generate them.")
     return credentials
 
-def _request_data(tz_aware_when, calendar):
+def _request_data(tz_aware_when, calendar, timezone):
     if MOCK_GOOGLE_CALENDAR_DATA:
         with open(local_file(MOCK_GOOGLE_CALENDAR_DATA_FILE)) as mock_data:
             eventsResult = ast.literal_eval(mock_data.read())
@@ -61,19 +61,28 @@ def _request_data(tz_aware_when, calendar):
         credentials = _get_credentials()
         http = credentials.authorize(httplib2.Http())
         service = discovery.build('calendar', 'v3', http=http)
-        cur_time = tz_aware_when.astimezone(pytz.utc).isoformat()
+        # Issues with all-day events not being returned by Google after the UTC date rolls over to tomorrow, even though the local time is still today
+        # So we'll just ask for everything today, and filter it locally.  Not great, but I'm not seeing a better solution
+        start_of_day = tz_aware_when.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(pytz.utc).isoformat()
         end_of_day = tz_aware_when.replace(hour=23, minute=59, second=59, microsecond=999999).astimezone(pytz.utc).isoformat()
-        eventsResult = service.events().list(calendarId=calendar['id'], timeMin=cur_time, timeMax=end_of_day, maxResults=10, singleEvents=True, orderBy='startTime').execute()
-    return eventsResult.get('items', [])
+        eventsResult = service.events().list(calendarId=calendar['id'], timeMin=start_of_day, timeMax=end_of_day, singleEvents=True, orderBy='startTime', timeZone=TIME_ZONE).execute()
+
+    eventsResult['items'] = eventsResult.get('items', [])
+    for event in eventsResult['items']:
+        event['parsed_start'] = dateutil.parser.parse(event['start']['dateTime']) if 'dateTime' in event['start'] else timezone.localize(dateutil.parser.parse(event['start']['date']))
+        event['parsed_end'] = dateutil.parser.parse(event['end']['dateTime']) if 'dateTime' in event['end'] else timezone.localize(dateutil.parser.parse(event['end']['date']))
+        event['all_day'] = 'date' in event['start']
+    eventsResult['items'] = [e for e in eventsResult['items'] if e['all_day'] or e['parsed_end'] > tz_aware_when]
+    return eventsResult['items']
 
 def _calendar_data(tz_aware_when, calendar, timezone):
-    events = _request_data(tz_aware_when, calendar)
+    events = _request_data(tz_aware_when, calendar, timezone)
     cleaned_events = []
     for event in events:
         cleaned_events.append({
             'calendar_label': calendar['label'],
-            'start': dateutil.parser.parse(event['start']['dateTime']) if 'dateTime' in event['start'] else timezone.localize(dateutil.parser.parse(event['start']['date'])),
-            'all_day': 'date' in event['start'],
+            'start': event['parsed_start'],
+            'all_day': event['all_day'],
             'description': event['summary'],
         })
     return cleaned_events
