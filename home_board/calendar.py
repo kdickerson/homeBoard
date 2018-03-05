@@ -72,7 +72,7 @@ def _request_data(tz_aware_when, calendar, timezone):
         event['parsed_start'] = dateutil.parser.parse(event['start']['dateTime']) if 'dateTime' in event['start'] else timezone.localize(dateutil.parser.parse(event['start']['date']))
         event['parsed_end'] = dateutil.parser.parse(event['end']['dateTime']) if 'dateTime' in event['end'] else timezone.localize(dateutil.parser.parse(event['end']['date']))
         event['all_day'] = 'date' in event['start']
-        event['underway'] = event['all_day'] or (event['parsed_start'] < tz_aware_when and event['parsed_end'] > tz_aware_when)
+        event['underway'] = event['parsed_start'] < tz_aware_when and event['parsed_end'] > tz_aware_when
     eventsResult['items'] = [e for e in eventsResult['items'] if e['all_day'] or e['parsed_end'] > tz_aware_when]
     return eventsResult['items']
 
