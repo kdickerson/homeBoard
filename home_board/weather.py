@@ -19,6 +19,18 @@ def _request_data(api_key, pws_id):
     parsed_json = json.loads(json_string)
     return parsed_json['current_observation'], parsed_json['forecast']['simpleforecast']['forecastday']
 
+def _extract_cleaned_forecast(day_idx, forecasts):
+    return {
+        'low-temperature': forecasts[day_idx]['low']['fahrenheit'],
+        'high-temperature': forecasts[day_idx]['high']['fahrenheit'],
+        'description': forecasts[day_idx]['conditions'],
+        'icon': forecasts[day_idx]['icon'],
+        'weekday': forecasts[day_idx]['date']['weekday_short'],
+        'month': forecasts[day_idx]['date']['month'],
+        'day': forecasts[day_idx]['date']['day'],
+        'monthname_short': forecasts[day_idx]['date']['monthname_short'],
+    }
+
 def _wunderground_data():
     with open(local_file(CLIENT_SECRET_FILE)) as key_file:
         api_key = key_file.read().strip()
@@ -32,34 +44,10 @@ def _wunderground_data():
         'icon': current['icon']
     }
     cleaned_forecast = {
-        'today': {
-            'low-temperature': forecasts[0]['low']['fahrenheit'],
-            'high-temperature': forecasts[0]['high']['fahrenheit'],
-            'description': forecasts[0]['conditions'],
-            'icon': forecasts[0]['icon'],
-            'weekday': forecasts[0]['date']['weekday_short']
-        },
-        'plus_one': {
-            'low-temperature': forecasts[1]['low']['fahrenheit'],
-            'high-temperature': forecasts[1]['high']['fahrenheit'],
-            'description': forecasts[1]['conditions'],
-            'icon': forecasts[1]['icon'],
-            'weekday': forecasts[1]['date']['weekday_short']
-        },
-        'plus_two': {
-            'low-temperature': forecasts[2]['low']['fahrenheit'],
-            'high-temperature': forecasts[2]['high']['fahrenheit'],
-            'description': forecasts[2]['conditions'],
-            'icon': forecasts[2]['icon'],
-            'weekday': forecasts[2]['date']['weekday_short']
-        },
-        'plus_three': {
-            'low-temperature': forecasts[3]['low']['fahrenheit'],
-            'high-temperature': forecasts[3]['high']['fahrenheit'],
-            'description': forecasts[3]['conditions'],
-            'icon': forecasts[3]['icon'],
-            'weekday': forecasts[3]['date']['weekday_short']
-        }
+        'today': _extract_cleaned_forecast(0, forecasts),
+        'plus_one': _extract_cleaned_forecast(1, forecasts),
+        'plus_two': _extract_cleaned_forecast(2, forecasts),
+        'plus_three': _extract_cleaned_forecast(3, forecasts),
     }
     return cleaned_current, cleaned_forecast
 
