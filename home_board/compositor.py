@@ -159,14 +159,17 @@ def create(weather, calendar, special_event):
     if calendar: _calendar_draw_day(image, draw, calendar['today'], (0, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     # 2nd Column
+    draw.line([(COLUMN_WIDTH, 0), (COLUMN_WIDTH, cal_bottom)], width=1, fill=BLACK)
     if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH, weather['forecast']['plus_one'], header_font, temp_font)
     if calendar: _calendar_draw_day(image, draw, calendar['plus_one'], (COLUMN_WIDTH, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     # 3rd Column
+    draw.line([(COLUMN_WIDTH*2, 0), (COLUMN_WIDTH*2, cal_bottom)], width=1, fill=BLACK)
     if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH*2, weather['forecast']['plus_two'], header_font, temp_font)
     if calendar: _calendar_draw_day(image, draw, calendar['plus_two'], (COLUMN_WIDTH*2, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     # 4th Column
+    draw.line([(COLUMN_WIDTH*3, 0), (COLUMN_WIDTH*3, cal_bottom)], width=1, fill=BLACK)
     if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['plus_three'], header_font, temp_font)
     if calendar: _calendar_draw_day(image, draw, calendar['plus_three'], (COLUMN_WIDTH*3, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
