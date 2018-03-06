@@ -120,7 +120,7 @@ def _special_event_draw(image, draw, event, footer_offset, font):
     iconsize = (0, 0)
     icon = None
     try:
-        icon = _load_event_icon(event['icon']) if hasattr(event, 'icon') else None
+        icon = _load_event_icon(event['icon']) if 'icon' in event else None
         if icon:
             iconsize = icon.size
     except:

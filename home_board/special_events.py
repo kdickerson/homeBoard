@@ -14,4 +14,4 @@ EVENTS = [
 def fetch():
     now = datetime.date.today()
     #now = datetime.date(2018, 12, 25)
-    return next((e for e in EVENTS if now.month is e['month'] and now.day is e['day'] and (not hasattr(e, 'year') or now.year is e['year'])), None)
+    return next((e for e in EVENTS if now.month is e['month'] and now.day is e['day'] and ('year' not in e or now.year is e['year'])), None)
