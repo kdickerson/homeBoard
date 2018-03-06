@@ -80,7 +80,8 @@ def _calendar_draw_day(image, draw, events, offset, bottom, time_font, descripti
         top = top + time_dim[1] + desc_dim[1] + padding
 
 def _weather_draw_today(image, draw, conditions, forecast, header_font, temp_font):
-    draw.text(_centered_text(draw, 'Today', header_font, COLUMN_WIDTH, (0, 0)), 'Today', font=header_font, fill=BLACK)
+    header = forecast['monthname_short'] + ' ' + str(forecast['day'])
+    draw.text(_centered_text(draw, header, header_font, COLUMN_WIDTH, (0, 0)), header, font=header_font, fill=RED)
     SUB_COLUMN_WIDTH = COLUMN_WIDTH // 2
 
     # Sub column 1:
