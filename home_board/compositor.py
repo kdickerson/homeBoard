@@ -115,12 +115,12 @@ def _weather_draw_forecast(image, draw, column_left, forecast, header_font, temp
     except:
         draw.text(_centered_text(draw, forecast['description'], temp_font, COLUMN_WIDTH, (column_left, 65)), forecast['description'], font=temp_font, fill=BLACK)
 
-def _special_event_draw(image, draw, event, bottom, font):
+def _special_event_draw(image, draw, event, footer_offset, font):
     textsize = draw.textsize(event['msg'], font=font)
     iconsize = (0, 0)
     icon = None
     try:
-        icon = _load_event_icon(event['icon']) if event['icon'] else None
+        icon = _load_event_icon(event['icon']) if hasattr(event, 'icon') else None
         if icon:
             iconsize = icon.size
     except:
@@ -133,13 +133,17 @@ def _special_event_draw(image, draw, event, bottom, font):
         padding = 0
         msgsize = textsize
 
-    left = (EPD_WIDTH - msgsize[0]) // 2
-    top = bottom - msgsize[1]
-    img_offset = (left, top + (msgsize[1] - iconsize[1]) // 2)
-    image.paste(icon, img_offset) if icon else None
-    text_offset = (left + iconsize[0] + padding, top + (msgsize[1] - textsize[1]) // 2)
+    icon_left = (EPD_WIDTH - msgsize[0]) // 2
+    icon_top = footer_offset[1] - msgsize[1]
+    icon_offset = (icon_left, icon_top + (msgsize[1] - iconsize[1]) // 2)
+    text_offset = (icon_left + iconsize[0] + padding, icon_top + (msgsize[1] - textsize[1]) // 2)
+    text_to_footer_gap = footer_offset[1] - (text_offset[1] + textsize[1])
+    if text_to_footer_gap > 0:
+        icon_offset = (icon_offset[0], icon_offset[1] + text_to_footer_gap)
+        text_offset = (text_offset[0], text_offset[1] + text_to_footer_gap)
+    image.paste(icon, icon_offset) if icon else None
     draw.text(text_offset, event['msg'], font=font, fill=RED)
-    return (min(img_offset[0], text_offset[0]), min(img_offset[1], text_offset[1])), msgsize
+    return (min(icon_offset[0], text_offset[0]), min(icon_offset[1], text_offset[1])), msgsize
 
 def _footer_draw(image, draw, text, font):
     dimensions = draw.textsize(text, font=font)
@@ -165,7 +169,7 @@ def create(weather, calendar, special_event):
 
     # Special event, centered across whole display, above footer
     if special_event:
-        special_offset, special_dimensions = _special_event_draw(image, draw, special_event, footer_offset[1], special_font)
+        special_offset, special_dimensions = _special_event_draw(image, draw, special_event, footer_offset, special_font)
 
     cal_bottom = (special_offset[1] if special_event else (footer_offset[1])) - 1
 
