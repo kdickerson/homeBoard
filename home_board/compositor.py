@@ -70,13 +70,15 @@ def _calendar_draw_day(image, draw, events, offset, bottom, time_font, descripti
     right_margin = 5
     bottom_margin = 5
     top = offset[1]
+    more_msg_height = draw.textsize('+123456789 More', font=description_font)[1] # Max height for "+X More" msg
     for idx, event in enumerate(events):
         header = ('' if event['all_day'] else event['start'].strftime('%-H:%M') + ' ') + event['calendar_label'] # %-H is Linux specific
         time, time_dim = _truncate_text(draw, header, time_font, COLUMN_WIDTH - right_margin - time_left_margin)
         desc, desc_dim = _truncate_text(draw, event['description'], description_font, COLUMN_WIDTH - right_margin - text_left_margin)
-        if top + time_dim[1] + desc_dim[1] > bottom:
-            msg = '+' + str(len(events) - idx) + ' More'
-            draw.text(_centered_text(draw, msg, description_font, COLUMN_WIDTH, (offset[0], top)), msg, font=description_font, fill=BLACK)
+
+        if top + time_dim[1] + desc_dim[1] + (0 if idx+1 is len(events) else more_msg_height) > bottom:
+            more_msg = '+' + str(len(events) - idx) + ' More'
+            draw.text(_centered_text(draw, more_msg, description_font, COLUMN_WIDTH, (offset[0], top)), more_msg, font=description_font, fill=BLACK)
             break
         draw.text((offset[0] + time_left_margin, top), time, font=time_font, fill=RED if event['underway'] else BLACK)
         draw.text((offset[0] + text_left_margin, top + time_dim[1]), desc, font=description_font, fill=RED if event['underway'] else BLACK)
