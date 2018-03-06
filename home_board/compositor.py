@@ -115,9 +115,9 @@ def _weather_draw_forecast(image, draw, column_left, forecast, header_font, temp
     except:
         draw.text(_centered_text(draw, forecast['description'], temp_font, COLUMN_WIDTH, (column_left, 65)), forecast['description'], font=temp_font, fill=BLACK)
 
-def _special_event_draw(image, draw, event, offset_bottom, font):
+def _special_event_draw(image, draw, event, bottom, font):
     textsize = draw.textsize(event['msg'], font=font)
-    iconsize = [0, 0]
+    iconsize = (0, 0)
     icon = None
     try:
         icon = _load_event_icon(event['icon']) if event['icon'] else None
@@ -134,9 +134,18 @@ def _special_event_draw(image, draw, event, offset_bottom, font):
         msgsize = textsize
 
     left = (EPD_WIDTH - msgsize[0]) // 2
-    top = EPD_HEIGHT - msgsize[1] - offset_bottom
-    image.paste(icon, (left, top + (msgsize[1] - iconsize[1]) // 2)) if icon else None
-    draw.text((left + iconsize[0] + padding, top + (msgsize[1] - textsize[1]) // 2), event['msg'], font=font, fill=RED)
+    top = bottom - msgsize[1]
+    img_offset = (left, top + (msgsize[1] - iconsize[1]) // 2)
+    image.paste(icon, img_offset) if icon else None
+    text_offset = (left + iconsize[0] + padding, top + (msgsize[1] - textsize[1]) // 2)
+    draw.text(text_offset, event['msg'], font=font, fill=RED)
+    return (min(img_offset[0], text_offset[0]), min(img_offset[1], text_offset[1])), msgsize
+
+def _footer_draw(image, draw, text, font):
+    dimensions = draw.textsize(text, font=font)
+    offset = (EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1])
+    draw.text(offset, text, font=font, fill=BLACK)
+    return offset, dimensions
 
 def create(weather, calendar, special_event):
     image = Image.new('L', (EPD_WIDTH, EPD_HEIGHT), WHITE)    # 255: clear the frame
@@ -150,12 +159,15 @@ def create(weather, calendar, special_event):
     footer_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 14)
 
     # Footer: Bottom-right corner
+    footer_offset = (EPD_WIDTH, EPD_HEIGHT)
     if weather:
-        dimensions = draw.textsize(weather['current']['time'], font=footer_font)
-        timestamp_height = dimensions[1]
-        draw.text((EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1]), weather['current']['time'], font=footer_font, fill=BLACK)
+        footer_offset, footer_dimensions = _footer_draw(image, draw, weather['current']['time'], footer_font)
 
-    cal_bottom = CALENDAR_BOTTOM if special_event else (EPD_HEIGHT - timestamp_height - 1)
+    # Special event, centered across whole display, above footer
+    if special_event:
+        special_offset, special_dimensions = _special_event_draw(image, draw, special_event, footer_offset[1], special_font)
+
+    cal_bottom = (special_offset[1] if special_event else (footer_offset[1])) - 1
 
     # 1st Column
     if weather: _weather_draw_today(image, draw, weather['current'], weather['forecast']['today'], header_font, temp_font)
@@ -175,8 +187,5 @@ def create(weather, calendar, special_event):
     draw.line([(COLUMN_WIDTH*3, 0), (COLUMN_WIDTH*3, cal_bottom)], width=1, fill=BLACK)
     if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['plus_three'], header_font, temp_font)
     if calendar: _calendar_draw_day(image, draw, calendar['plus_three'], (COLUMN_WIDTH*3, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
-
-    if special_event:
-        _special_event_draw(image, draw, special_event, timestamp_height, special_font)
 
     return image
