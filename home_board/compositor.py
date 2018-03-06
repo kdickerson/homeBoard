@@ -105,7 +105,6 @@ def _weather_draw_today(image, draw, conditions, forecast, header_font, temp_fon
     except:
         draw.text(_centered_text(draw, conditions['description'], temp_font, COLUMN_WIDTH, (0, 65)), conditions['description'], font=temp_font, fill=BLACK)
 
-
 def _weather_draw_forecast(image, draw, column_left, forecast, header_font, temp_font):
     draw.text(_centered_text(draw, forecast['weekday'], header_font, COLUMN_WIDTH, (column_left, 0)), forecast['weekday'], font=header_font, fill=BLACK)
     msg = str(forecast['low-temperature']) + '–' + str(forecast['high-temperature']) # Center before adding the °
@@ -156,7 +155,7 @@ def create(weather, calendar, special_event):
         timestamp_height = dimensions[1]
         draw.text((EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1]), weather['current']['time'], font=footer_font, fill=BLACK)
 
-    cal_bottom = CALENDAR_BOTTOM if special_event else (EPD_HEIGHT - 35) # TODO: Don't like the magic number here; fix later with real calculation
+    cal_bottom = CALENDAR_BOTTOM if special_event else (EPD_HEIGHT - timestamp_height - 1)
 
     # 1st Column
     if weather: _weather_draw_today(image, draw, weather['current'], weather['forecast']['today'], header_font, temp_font)
