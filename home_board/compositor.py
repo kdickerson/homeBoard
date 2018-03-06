@@ -102,8 +102,8 @@ def _weather_draw_today(image, draw, conditions, forecast, header_font, temp_fon
         draw.text(_centered_text(draw, conditions['description'], temp_font, COLUMN_WIDTH, (0, 65)), conditions['description'], font=temp_font, fill=BLACK)
 
 
-def _weather_draw_forecast(image, draw, column_left, header, forecast, header_font, temp_font):
-    draw.text(_centered_text(draw, header, header_font, COLUMN_WIDTH, (column_left, 0)), header, font=header_font, fill=BLACK)
+def _weather_draw_forecast(image, draw, column_left, forecast, header_font, temp_font):
+    draw.text(_centered_text(draw, forecast['weekday'], header_font, COLUMN_WIDTH, (column_left, 0)), forecast['weekday'], font=header_font, fill=BLACK)
     msg = str(forecast['low-temperature']) + '–' + str(forecast['high-temperature']) # Center before adding the °
     draw.text(_centered_text(draw, msg, temp_font, COLUMN_WIDTH, (column_left, 40)), msg + '°', font=temp_font, fill=BLACK)
     try:
@@ -159,15 +159,15 @@ def create(weather, calendar, special_event):
     if calendar: _calendar_draw_day(image, draw, calendar['today'], (0, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     # 2nd Column
-    if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH, weather['forecast']['plus_one']['weekday'], weather['forecast']['plus_one'], header_font, temp_font)
+    if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH, weather['forecast']['plus_one'], header_font, temp_font)
     if calendar: _calendar_draw_day(image, draw, calendar['plus_one'], (COLUMN_WIDTH, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     # 3rd Column
-    if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH*2, weather['forecast']['plus_two']['weekday'], weather['forecast']['plus_two'], header_font, temp_font)
+    if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH*2, weather['forecast']['plus_two'], header_font, temp_font)
     if calendar: _calendar_draw_day(image, draw, calendar['plus_two'], (COLUMN_WIDTH*2, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     # 4th Column
-    if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['plus_three']['weekday'], weather['forecast']['plus_three'], header_font, temp_font)
+    if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['plus_three'], header_font, temp_font)
     if calendar: _calendar_draw_day(image, draw, calendar['plus_three'], (COLUMN_WIDTH*3, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     if special_event:
