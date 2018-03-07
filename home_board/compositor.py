@@ -11,7 +11,6 @@ RED = 128
 
 COLUMN_WIDTH = 160
 CALENDAR_TOP = 130
-CALENDAR_BOTTOM = 305
 
 WEATHER_ICON_MAP = {
     'chanceflurries': 'chancesnow.bmp',
