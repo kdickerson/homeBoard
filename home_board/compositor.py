@@ -64,7 +64,7 @@ def _truncate_text(draw, text, font, width):
     return (text[:i-1] + '…') if i < 0 else text, dimensions
 
 def _calendar_draw_day(image, draw, events, offset, bottom, time_font, description_font):
-    time_left_margin = 2
+    time_left_margin = 5
     text_left_margin = 5
     right_margin = 5
     bottom_margin = 5
