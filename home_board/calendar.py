@@ -49,8 +49,10 @@ def _get_credentials():
     """
     store = _get_credentials_store()
     credentials = store.get()
-    if not credentials or credentials.invalid:
-        raise ValueError("No valid credentials found.  Run generate_credentials manually to generate them.")
+    if not credentials:
+        raise ValueError("No valid credentials found.  Run generate_credentials manually to generate them.  Must be done manually with available local web browser the first time only.")
+    if credentials.invalid:
+        credentials = generate_credentials()
     return credentials
 
 def _request_data(tz_aware_when, calendar, timezone):
@@ -117,6 +119,7 @@ def generate_credentials():
         flow = client.flow_from_clientsecrets(local_file(__file__, CLIENT_SECRET_FILE), SCOPES)
         flow.user_agent = APPLICATION_NAME
         credentials = tools.run_flow(flow, store)
+    return credentials
 
 def list_calendars():
     credentials = _get_credentials()
