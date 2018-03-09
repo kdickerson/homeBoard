@@ -10,7 +10,7 @@ MOCK_WUNDERGROUND_DATA_FILE = '../mock_data/mock_wunderground_data.json'
 
 def _request_data(api_key, pws_id):
     if MOCK_WUNDERGROUND_DATA:
-        with open(local_file(MOCK_WUNDERGROUND_DATA_FILE)) as mock_data:
+        with open(local_file(__file__, MOCK_WUNDERGROUND_DATA_FILE)) as mock_data:
             json_string = mock_data.read()
     else:
         query_url = 'http://api.wunderground.com/api/{api_key}/conditions/forecast/q/pws:{pws_id}.json'.format(api_key=api_key, pws_id=pws_id)
@@ -32,7 +32,7 @@ def _extract_cleaned_forecast(day_idx, forecasts):
     }
 
 def _wunderground_data():
-    with open(local_file(CLIENT_SECRET_FILE)) as key_file:
+    with open(local_file(__file__, CLIENT_SECRET_FILE)) as key_file:
         api_key = key_file.read().strip()
 
     current, forecasts = _request_data(api_key, PWS_ID)

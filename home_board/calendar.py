@@ -33,7 +33,7 @@ CALENDARS = [
 ]
 
 def _get_credentials_store():
-    credential_path = local_file(CREDENTIALS_FILE)
+    credential_path = local_file(__file__, CREDENTIALS_FILE)
     return Storage(credential_path)
 
 def _get_credentials():
@@ -55,7 +55,7 @@ def _get_credentials():
 
 def _request_data(tz_aware_when, calendar, timezone):
     if MOCK_GOOGLE_CALENDAR_DATA:
-        with open(local_file(MOCK_GOOGLE_CALENDAR_DATA_FILE)) as mock_data:
+        with open(local_file(__file__, MOCK_GOOGLE_CALENDAR_DATA_FILE)) as mock_data:
             eventsResult = ast.literal_eval(mock_data.read())
     else:
         credentials = _get_credentials()
