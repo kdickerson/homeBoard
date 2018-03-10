@@ -171,7 +171,7 @@ def create(context):
     if context['today']['special_event'] and 'msg' in context['today']['special_event']:
         special_offset, special_dimensions = _draw_special_event(image, draw, context['today']['special_event'], footer_offset, fonts['special'])
 
-    cal_bottom = (special_offset[1] if special_offset else (footer_offset[1])) - 1
+    cal_bottom = (special_offset[1] if special_offset else footer_offset[1]) - 1
 
     # 1st Column
     left = 0
