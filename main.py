@@ -17,7 +17,7 @@ def make_image():
     context['plus_three']['date'] = context['today']['date'] + datetime.timedelta(days=3)
 
     try:
-        conditions = weather.fetch()
+        conditions = weather.fetch() # weather can only fetch conditions and forecast for "now"
         context['today']['conditions'] = conditions['current']
         for day in days:
             context[day]['forecast'] = conditions['forecast'][day]
@@ -26,7 +26,7 @@ def make_image():
         print(ex)
 
     try:
-        calender_events = calendar.fetch()
+        calender_events = calendar.fetch(context['now'])
         for day in days:
             context[day]['events'] = calender_events[day]
     except Exception as ex:
@@ -34,7 +34,7 @@ def make_image():
         print(ex)
 
     try:
-        special_event = special_events.fetch()
+        special_event = special_events.fetch(context['today']['date'])
         for day in days:
             context[day]['special_event'] = special_event[day]
     except Exception as ex:

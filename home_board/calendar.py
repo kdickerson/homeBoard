@@ -98,17 +98,15 @@ def _fetch_events_for_day(day, calendars, timezone):
     events.sort(key=lambda e: e['start'])
     return events
 
-def fetch():
-    tz = pytz.timezone(TIME_ZONE)
-    now = tz.localize(datetime.datetime.now())
-    plus_one = now.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
+def fetch(tz_aware_when):
+    plus_one = tz_aware_when.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
     plus_two = plus_one + datetime.timedelta(days=1)
     plus_three = plus_two + datetime.timedelta(days=1)
     return {
-        'today': _fetch_events_for_day(now, CALENDARS, tz),
-        'plus_one': _fetch_events_for_day(plus_one, CALENDARS, tz),
-        'plus_two': _fetch_events_for_day(plus_two, CALENDARS, tz),
-        'plus_three': _fetch_events_for_day(plus_three, CALENDARS, tz)
+        'today': _fetch_events_for_day(tz_aware_when, CALENDARS, tz_aware_when.tzinfo),
+        'plus_one': _fetch_events_for_day(plus_one, CALENDARS, tz_aware_when.tzinfo),
+        'plus_two': _fetch_events_for_day(plus_two, CALENDARS, tz_aware_when.tzinfo),
+        'plus_three': _fetch_events_for_day(plus_three, CALENDARS, tz_aware_when.tzinfo)
     }
 
 def generate_credentials():
