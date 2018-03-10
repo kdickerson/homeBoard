@@ -2,13 +2,17 @@
 import datetime
 
 EVENTS = [
+    {'month': 1, 'day': 1, 'title': 'New Years'},
     {'month': 3, 'day': 17, 'title': 'Corinne\'s Birthday', 'msg': 'Happy Birthday, Corinne!', 'icon': 'birthday'},
+    {'year': 2018, 'month': 4, 'day': 1, 'title': 'Easter'},
     {'month': 6, 'day': 9, 'title': 'Kyle\'s Birthday', 'msg': 'Happy Birthday, Kyle!', 'icon': 'birthday'},
     {'month': 9, 'day': 20, 'title': 'Jess\' Birthday', 'msg': 'Happy Birthday, Jess!', 'icon': 'birthday'},
     {'month': 10, 'day': 28, 'title': 'Heather\'s Birthday', 'msg': 'Happy Birthday, Heather!', 'icon': 'birthday'},
     {'month': 10, 'day': 31, 'title': 'Halloween', 'msg': 'Happy Halloween!', 'icon': 'halloween'},
+    {'month': 12, 'day': 24, 'title': 'Christmas Eve'},
     {'month': 12, 'day': 25, 'title': 'Christmas', 'msg': 'Merry Christmas!', 'icon': 'christmas'},
     {'year': 2018, 'month': 11, 'day': 22, 'title': 'Thanksgiving', 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
+    {'month': 12, 'day': 31, 'title': 'New Years Eve'},
 ]
 
 def fetch():
