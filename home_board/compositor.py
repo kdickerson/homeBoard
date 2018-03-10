@@ -164,7 +164,8 @@ def create(context):
     footer_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 14)
 
     # Footer: Bottom-right corner
-    footer_offset, footer_dimensions = _footer_draw(image, draw, context['updated'], footer_font)
+    updated_msg = 'Updated ' + context['now'].strftime('%B %-m, %-I:%M %p') # %-m and %-I are platform specific
+    footer_offset, footer_dimensions = _footer_draw(image, draw, updated_msg, footer_font)
 
     # Special event, centered across whole display, above footer
     special_offset = None

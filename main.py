@@ -10,9 +10,8 @@ def make_image():
     days = ['today', 'plus_one', 'plus_two', 'plus_three']
     context = {day: {'conditions': None, 'forecast': None, 'events': [], 'special_event': None} for day in days}
     tz = pytz.timezone(TIME_ZONE)
-    now = tz.localize(datetime.datetime.now())
-    context['updated'] = 'Updated ' + datetime.datetime.now().strftime('%B %-m, %-I:%M %p')
-    context['today']['date'] = now.date()
+    context['now'] = tz.localize(datetime.datetime.now())
+    context['today']['date'] = context['now'].date()
     context['plus_one']['date'] = context['today']['date'] + datetime.timedelta(days=1)
     context['plus_two']['date'] = context['today']['date'] + datetime.timedelta(days=2)
     context['plus_three']['date'] = context['today']['date'] + datetime.timedelta(days=3)
