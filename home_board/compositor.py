@@ -153,7 +153,7 @@ def _footer_draw(image, draw, text, font):
     return offset, dimensions
 
 def create(context):
-    image = Image.new('L', (EPD_WIDTH, EPD_HEIGHT), WHITE)    # 255: clear the frame
+    image = Image.new('L', (EPD_WIDTH, EPD_HEIGHT), WHITE)
     draw = ImageDraw.Draw(image)
     draw.fontmode = '1' # No Anti-aliasing
     fonts = {

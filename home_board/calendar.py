@@ -13,7 +13,6 @@ from oauth2client import tools
 from oauth2client.file import Storage
 
 # If modifying these scopes, delete your previously saved credentials
-# at ~/.credentials/calendar-python-quickstart.json
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 CLIENT_SECRET_FILE = 'private/google_calendar.key'
 CREDENTIALS_FILE = 'private/google_calendar_credentials.key'
