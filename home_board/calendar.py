@@ -18,7 +18,6 @@ SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
 CLIENT_SECRET_FILE = 'private/google_calendar.key'
 CREDENTIALS_FILE = 'private/google_calendar_credentials.key'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
-TIME_ZONE = "America/Los_Angeles"
 MOCK_GOOGLE_CALENDAR_DATA = False
 MOCK_GOOGLE_CALENDAR_DATA_FILE = 'mock_data/mock_google_calendar_data.py.txt'
 
@@ -67,7 +66,7 @@ def _request_data(tz_aware_when, calendar, timezone):
         # So we'll just ask for everything today, and filter it locally.  Not great, but I'm not seeing a better solution
         start_of_day = tz_aware_when.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(pytz.utc).isoformat()
         end_of_day = tz_aware_when.replace(hour=23, minute=59, second=59, microsecond=999999).astimezone(pytz.utc).isoformat()
-        eventsResult = service.events().list(calendarId=calendar['id'], timeMin=start_of_day, timeMax=end_of_day, singleEvents=True, orderBy='startTime', timeZone=TIME_ZONE).execute()
+        eventsResult = service.events().list(calendarId=calendar['id'], timeMin=start_of_day, timeMax=end_of_day, singleEvents=True, orderBy='startTime', timeZone=tz_aware_when.tzinfo.zone).execute()
 
     eventsResult['items'] = eventsResult.get('items', [])
     for event in eventsResult['items']:
