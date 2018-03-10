@@ -51,9 +51,10 @@ def _load_weather_icon(icon):
 def _load_event_icon(icon):
     return Image.open(local_file(os.path.join(EVENTS_ICON_PATH, EVENT_ICON_MAP[icon])))
 
-def _centered_text(draw, text, font, width, offset):
-    dimensions = draw.textsize(text, font=font)
-    return ((width - dimensions[0]) // 2 + offset[0], offset[1])
+def _draw_centered_text(draw, offset, width, text, font, color=BLACK, measure_text=None):
+    dimensions = draw.textsize(measure_text if measure_text else text, font=font)
+    loc = ((width - dimensions[0]) // 2 + offset[0], offset[1])
+    draw.text(loc, text, font=font, fill=color)
 
 def _truncate_text(draw, text, font, width):
     dimensions = draw.textsize(text, font=font)
@@ -64,7 +65,7 @@ def _truncate_text(draw, text, font, width):
     return (text[:i-1] + '…') if i < 0 else text, dimensions
 
 def _draw_header(draw, offset, text, font, color=BLACK):
-    draw.text(_centered_text(draw, text, font, COLUMN_WIDTH, offset), text, font=font, fill=color)
+    _draw_centered_text(draw, offset, COLUMN_WIDTH, text, font, color)
 
 def _draw_calendar(image, draw, events, offset, bottom, time_font, description_font):
     time_left_margin = 5
@@ -80,7 +81,7 @@ def _draw_calendar(image, draw, events, offset, bottom, time_font, description_f
 
         if top + time_dim[1] + desc_dim[1] + (0 if idx+1 is len(events) else more_msg_height) > bottom:
             more_msg = '+' + str(len(events) - idx) + ' More'
-            draw.text(_centered_text(draw, more_msg, description_font, COLUMN_WIDTH, (offset[0], top)), more_msg, font=description_font, fill=BLACK)
+            _draw_centered_text(draw, (offset[0], top), COLUMN_WIDTH, more_msg, description_font)
             break
         draw.text((offset[0] + time_left_margin, top), time, font=time_font, fill=RED if event['underway'] else BLACK)
         draw.text((offset[0] + text_left_margin, top + time_dim[1]), desc, font=description_font, fill=RED if event['underway'] else BLACK)
@@ -90,14 +91,10 @@ def _draw_forecast_and_current(image, draw, conditions, forecast, header_font, t
     SUB_COLUMN_WIDTH = COLUMN_WIDTH // 2
 
     # Sub column 1:
-    cur_size = draw.textsize(str(conditions['temperature']), font=temp_font)
-    draw.text(_centered_text(draw, str(conditions['temperature']), temp_font, SUB_COLUMN_WIDTH, (0, 40)), str(conditions['temperature']) + '°', font=temp_font, fill=RED)
+    _draw_centered_text(draw, (0, 40), SUB_COLUMN_WIDTH, str(conditions['temperature']) + '°', temp_font, color=RED, measure_text=str(conditions['temperature']))
 
     # Sub column 2:
-    forecast_msg = str(forecast['high-temperature'])
-    forecast_size = draw.textsize(forecast_msg, font=temp_font)
-    detail_offset = cur_size[1] - forecast_size[1]
-    draw.text(_centered_text(draw, forecast_msg, temp_font, SUB_COLUMN_WIDTH, (SUB_COLUMN_WIDTH, 40 + detail_offset)), forecast_msg + '°', font=temp_font, fill=BLACK)
+    _draw_centered_text(draw, (SUB_COLUMN_WIDTH, 40), SUB_COLUMN_WIDTH, str(forecast['high-temperature']) + '°', temp_font, measure_text=str(forecast['high-temperature']))
 
     try:
         cur_icon = _load_weather_icon(conditions['icon']).point(BLACK_TO_RED_LUT)
@@ -105,16 +102,16 @@ def _draw_forecast_and_current(image, draw, conditions, forecast, header_font, t
         image.paste(cur_icon, ((SUB_COLUMN_WIDTH - cur_icon.size[0]) // 2, 65))
         image.paste(forecast_icon, ((SUB_COLUMN_WIDTH - cur_icon.size[0]) // 2 + SUB_COLUMN_WIDTH, 65))
     except:
-        draw.text(_centered_text(draw, conditions['description'], temp_font, COLUMN_WIDTH, (0, 65)), conditions['description'], font=temp_font, fill=BLACK)
+        _draw_centered_text(draw, (0, 65), COLUMN_WIDTH, conditions['description'], temp_font)
 
 def _draw_forecast(image, draw, column_left, forecast, header_font, temp_font):
     msg = str(forecast['low-temperature']) + '–' + str(forecast['high-temperature']) # Center before adding the °
-    draw.text(_centered_text(draw, msg, temp_font, COLUMN_WIDTH, (column_left, 40)), msg + '°', font=temp_font, fill=BLACK)
+    _draw_centered_text(draw, (column_left, 40), COLUMN_WIDTH, msg + '°', temp_font, measure_text=msg)
     try:
         icon = _load_weather_icon(forecast['icon'])
         image.paste(icon, ((COLUMN_WIDTH - icon.size[0]) // 2 + column_left, 65))
     except:
-        draw.text(_centered_text(draw, forecast['description'], temp_font, COLUMN_WIDTH, (column_left, 65)), forecast['description'], font=temp_font, fill=BLACK)
+        _draw_centered_text(draw, (column_left, 65), COLUMN_WIDTH, forecast['description'], temp_font)
 
 def _draw_special_event(image, draw, event, footer_offset, font):
     textsize = draw.textsize(event['msg'], font=font)
