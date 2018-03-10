@@ -15,12 +15,12 @@ from oauth2client.file import Storage
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/calendar-python-quickstart.json
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
-CLIENT_SECRET_FILE = '../private/google_calendar.key'
-CREDENTIALS_FILE = '../private/google_calendar_credentials.key'
+CLIENT_SECRET_FILE = 'private/google_calendar.key'
+CREDENTIALS_FILE = 'private/google_calendar_credentials.key'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 TIME_ZONE = "America/Los_Angeles"
 MOCK_GOOGLE_CALENDAR_DATA = False
-MOCK_GOOGLE_CALENDAR_DATA_FILE = '../mock_data/mock_google_calendar_data.py.txt'
+MOCK_GOOGLE_CALENDAR_DATA_FILE = 'mock_data/mock_google_calendar_data.py.txt'
 
 # See list_calendars() to get a list of available IDs
 CALENDARS = [
@@ -33,7 +33,7 @@ CALENDARS = [
 ]
 
 def _get_credentials_store():
-    credential_path = local_file(__file__, CREDENTIALS_FILE)
+    credential_path = local_file(CREDENTIALS_FILE)
     return Storage(credential_path)
 
 def _get_credentials():
@@ -57,7 +57,7 @@ def _get_credentials():
 
 def _request_data(tz_aware_when, calendar, timezone):
     if MOCK_GOOGLE_CALENDAR_DATA:
-        with open(local_file(__file__, MOCK_GOOGLE_CALENDAR_DATA_FILE)) as mock_data:
+        with open(local_file(MOCK_GOOGLE_CALENDAR_DATA_FILE)) as mock_data:
             eventsResult = ast.literal_eval(mock_data.read())
     else:
         credentials = _get_credentials()
@@ -116,7 +116,7 @@ def generate_credentials():
     store = _get_credentials_store()
     credentials = store.get()
     if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(local_file(__file__, CLIENT_SECRET_FILE), SCOPES)
+        flow = client.flow_from_clientsecrets(local_file(CLIENT_SECRET_FILE), SCOPES)
         flow.user_agent = APPLICATION_NAME
         credentials = tools.run_flow(flow, store)
     return credentials

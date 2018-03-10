@@ -41,15 +41,15 @@ EVENT_ICON_MAP = {
     'thanksgiving': 'thanksgiving.bmp'
 }
 
-WEATHER_ICON_PATH = '../icons/weather/'
-EVENTS_ICON_PATH = '../icons/events/'
+WEATHER_ICON_PATH = 'icons/weather/'
+EVENTS_ICON_PATH = 'icons/events/'
 BLACK_TO_RED_LUT = [RED] + ([BLACK] * 254) + [WHITE] # Map BLACK to RED, leave WHITE alone; use with Image.point()
 
 def _load_weather_icon(icon):
-    return Image.open(local_file(__file__, os.path.join(WEATHER_ICON_PATH, WEATHER_ICON_MAP[icon]))) # Expecting 64x64 monochrome icons
+    return Image.open(local_file(os.path.join(WEATHER_ICON_PATH, WEATHER_ICON_MAP[icon]))) # Expecting 64x64 monochrome icons
 
 def _load_event_icon(icon):
-    return Image.open(local_file(__file__, os.path.join(EVENTS_ICON_PATH, EVENT_ICON_MAP[icon])))
+    return Image.open(local_file(os.path.join(EVENTS_ICON_PATH, EVENT_ICON_MAP[icon])))
 
 def _centered_text(draw, text, font, width, offset):
     dimensions = draw.textsize(text, font=font)
@@ -156,12 +156,12 @@ def create(weather, calendar, special_event):
     image = Image.new('L', (EPD_WIDTH, EPD_HEIGHT), WHITE)    # 255: clear the frame
     draw = ImageDraw.Draw(image)
     draw.fontmode = '1' # No Anti-aliasing
-    header_font = ImageFont.truetype(local_file(__file__, '../fonts/FreeSansBold.ttf'), 36)
+    header_font = ImageFont.truetype(local_file('fonts/FreeSansBold.ttf'), 36)
     special_font = header_font
-    temp_font = ImageFont.truetype(local_file(__file__, '../fonts/FreeSans.ttf'), 24)
-    cal_time_font = ImageFont.truetype(local_file(__file__, '../fonts/FreeSans.ttf'), 20)
-    cal_text_font = ImageFont.truetype(local_file(__file__, '../fonts/FreeSans.ttf'), 16)
-    footer_font = ImageFont.truetype(local_file(__file__, '../fonts/FreeSans.ttf'), 14)
+    temp_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 24)
+    cal_time_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 20)
+    cal_text_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 16)
+    footer_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 14)
 
     # Footer: Bottom-right corner
     footer_offset = (EPD_WIDTH, EPD_HEIGHT)

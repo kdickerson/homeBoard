@@ -1,4 +1,9 @@
 import os
 
-def local_file(script, path_relative_to_script):
-    return os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(script)), path_relative_to_script))
+_base_path = './'
+
+def set_base_path(path):
+    _base_path = path
+
+def local_file(path_relative_to_project_base):
+    return os.path.abspath(os.path.join(_base_path, path_relative_to_project_base))

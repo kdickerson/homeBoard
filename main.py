@@ -1,5 +1,6 @@
-from home_board import weather, calendar, special_events, compositor
+from home_board import weather, calendar, special_events, compositor, util
 import datetime
+import os
 import sys
 
 def make_image():
@@ -41,6 +42,8 @@ def save_image():
     python main.py save
 '''
 if __name__ == '__main__':
+    util.set_base_path(os.path.dirname(os.path.abspath(__file__)))
+
     if len(sys.argv) > 1 and sys.argv[1] == 'save':
         save_image()
     else:
