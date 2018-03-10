@@ -66,7 +66,7 @@ def _truncate_text(draw, text, font, width):
 def _draw_header(draw, offset, text, font, color=BLACK):
     draw.text(_centered_text(draw, text, font, COLUMN_WIDTH, offset), text, font=font, fill=color)
 
-def _calendar_draw_day(image, draw, events, offset, bottom, time_font, description_font):
+def _draw_calendar(image, draw, events, offset, bottom, time_font, description_font):
     time_left_margin = 5
     text_left_margin = 5
     right_margin = 5
@@ -86,7 +86,7 @@ def _calendar_draw_day(image, draw, events, offset, bottom, time_font, descripti
         draw.text((offset[0] + text_left_margin, top + time_dim[1]), desc, font=description_font, fill=RED if event['underway'] else BLACK)
         top = top + time_dim[1] + desc_dim[1] + bottom_margin
 
-def _weather_draw_today(image, draw, conditions, forecast, header_font, temp_font):
+def _draw_forecast_and_current(image, draw, conditions, forecast, header_font, temp_font):
     SUB_COLUMN_WIDTH = COLUMN_WIDTH // 2
 
     # Sub column 1:
@@ -107,7 +107,7 @@ def _weather_draw_today(image, draw, conditions, forecast, header_font, temp_fon
     except:
         draw.text(_centered_text(draw, conditions['description'], temp_font, COLUMN_WIDTH, (0, 65)), conditions['description'], font=temp_font, fill=BLACK)
 
-def _weather_draw_forecast(image, draw, column_left, forecast, header_font, temp_font):
+def _draw_forecast(image, draw, column_left, forecast, header_font, temp_font):
     msg = str(forecast['low-temperature']) + '–' + str(forecast['high-temperature']) # Center before adding the °
     draw.text(_centered_text(draw, msg, temp_font, COLUMN_WIDTH, (column_left, 40)), msg + '°', font=temp_font, fill=BLACK)
     try:
@@ -116,7 +116,7 @@ def _weather_draw_forecast(image, draw, column_left, forecast, header_font, temp
     except:
         draw.text(_centered_text(draw, forecast['description'], temp_font, COLUMN_WIDTH, (column_left, 65)), forecast['description'], font=temp_font, fill=BLACK)
 
-def _special_event_draw(image, draw, event, footer_offset, font):
+def _draw_special_event(image, draw, event, footer_offset, font):
     textsize = draw.textsize(event['msg'], font=font)
     iconsize = (0, 0)
     icon = None
@@ -146,7 +146,7 @@ def _special_event_draw(image, draw, event, footer_offset, font):
     draw.text(text_offset, event['msg'], font=font, fill=RED)
     return (min(icon_offset[0], text_offset[0]), min(icon_offset[1], text_offset[1])), msgsize
 
-def _footer_draw(image, draw, text, font):
+def _draw_footer(image, draw, text, font):
     dimensions = draw.textsize(text, font=font)
     offset = (EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1])
     draw.text(offset, text, font=font, fill=BLACK)
@@ -167,40 +167,40 @@ def create(context):
 
     # Footer: Bottom-right corner
     updated_msg = 'Updated ' + context['now'].strftime('%B %-m, %-I:%M %p') # %-m and %-I are platform specific
-    footer_offset, footer_dimensions = _footer_draw(image, draw, updated_msg, fonts['footer'])
+    footer_offset, footer_dimensions = _draw_footer(image, draw, updated_msg, fonts['footer'])
 
     # Special event, centered across whole display, above footer
     special_offset = None
     if context['today']['special_event'] and 'msg' in context['today']['special_event']:
-        special_offset, special_dimensions = _special_event_draw(image, draw, context['today']['special_event'], footer_offset, fonts['special'])
+        special_offset, special_dimensions = _draw_special_event(image, draw, context['today']['special_event'], footer_offset, fonts['special'])
 
     cal_bottom = (special_offset[1] if special_offset else (footer_offset[1])) - 1
 
     # 1st Column
     left = 0
     _draw_header(draw, (left, 0), context['today']['date'].strftime('%b %-m'), fonts['header'], RED)
-    if context['today']['conditions'] and context['today']['forecast']: _weather_draw_today(image, draw, context['today']['conditions'], context['today']['forecast'], fonts['header'], fonts['temperature'])
-    if context['today']['events']: _calendar_draw_day(image, draw, context['today']['events'], (left, CALENDAR_TOP), cal_bottom, fonts['calendar_header'], fonts['calendar_body'])
+    if context['today']['conditions'] and context['today']['forecast']: _draw_forecast_and_current(image, draw, context['today']['conditions'], context['today']['forecast'], fonts['header'], fonts['temperature'])
+    if context['today']['events']: _draw_calendar(image, draw, context['today']['events'], (left, CALENDAR_TOP), cal_bottom, fonts['calendar_header'], fonts['calendar_body'])
 
     # 2nd Column
     left = COLUMN_WIDTH
     draw.line([(left, 0), (left, cal_bottom)], width=1, fill=BLACK)
     _draw_header(draw, (left, 0), context['plus_one']['date'].strftime('%a'), fonts['header'])
-    if context['plus_one']['forecast']: _weather_draw_forecast(image, draw, left, context['plus_one']['forecast'], fonts['header'], fonts['temperature'])
-    if context['plus_one']['events']: _calendar_draw_day(image, draw, context['plus_one']['events'], (left, CALENDAR_TOP), cal_bottom, fonts['calendar_header'], fonts['calendar_body'])
+    if context['plus_one']['forecast']: _draw_forecast(image, draw, left, context['plus_one']['forecast'], fonts['header'], fonts['temperature'])
+    if context['plus_one']['events']: _draw_calendar(image, draw, context['plus_one']['events'], (left, CALENDAR_TOP), cal_bottom, fonts['calendar_header'], fonts['calendar_body'])
 
     # 3rd Column
     left = COLUMN_WIDTH * 2
     draw.line([(left, 0), (left, cal_bottom)], width=1, fill=BLACK)
     _draw_header(draw, (left, 0), context['plus_two']['date'].strftime('%a'), fonts['header'])
-    if context['plus_two']['forecast']: _weather_draw_forecast(image, draw, left, context['plus_two']['forecast'], fonts['header'], fonts['temperature'])
-    if context['plus_two']['events']: _calendar_draw_day(image, draw, context['plus_two']['events'], (left, CALENDAR_TOP), cal_bottom, fonts['calendar_header'], fonts['calendar_body'])
+    if context['plus_two']['forecast']: _draw_forecast(image, draw, left, context['plus_two']['forecast'], fonts['header'], fonts['temperature'])
+    if context['plus_two']['events']: _draw_calendar(image, draw, context['plus_two']['events'], (left, CALENDAR_TOP), cal_bottom, fonts['calendar_header'], fonts['calendar_body'])
 
     # 4th Column
     left = COLUMN_WIDTH * 3
     draw.line([(left, 0), (left, cal_bottom)], width=1, fill=BLACK)
     _draw_header(draw, (left, 0), context['plus_three']['date'].strftime('%a'), fonts['header'])
-    if context['plus_three']['forecast']: _weather_draw_forecast(image, draw, left, context['plus_three']['forecast'], fonts['header'], fonts['temperature'])
-    if context['plus_three']['events']: _calendar_draw_day(image, draw, context['plus_three']['events'], (left, CALENDAR_TOP), cal_bottom, fonts['calendar_header'], fonts['calendar_body'])
+    if context['plus_three']['forecast']: _draw_forecast(image, draw, left, context['plus_three']['forecast'], fonts['header'], fonts['temperature'])
+    if context['plus_three']['events']: _draw_calendar(image, draw, context['plus_three']['events'], (left, CALENDAR_TOP), cal_bottom, fonts['calendar_header'], fonts['calendar_body'])
 
     return image
