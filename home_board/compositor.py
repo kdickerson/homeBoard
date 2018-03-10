@@ -152,7 +152,7 @@ def _footer_draw(image, draw, text, font):
     draw.text(offset, text, font=font, fill=BLACK)
     return offset, dimensions
 
-def create(weather, calendar, special_event):
+def create(context):
     image = Image.new('L', (EPD_WIDTH, EPD_HEIGHT), WHITE)    # 255: clear the frame
     draw = ImageDraw.Draw(image)
     draw.fontmode = '1' # No Anti-aliasing
@@ -164,34 +164,32 @@ def create(weather, calendar, special_event):
     footer_font = ImageFont.truetype(local_file('fonts/FreeSans.ttf'), 14)
 
     # Footer: Bottom-right corner
-    footer_offset = (EPD_WIDTH, EPD_HEIGHT)
-    if weather:
-        footer_offset, footer_dimensions = _footer_draw(image, draw, weather['current']['time'], footer_font)
+    footer_offset, footer_dimensions = _footer_draw(image, draw, context['updated'], footer_font)
 
     # Special event, centered across whole display, above footer
     special_offset = None
-    if special_event and special_event['today'] is not None and 'msg' in special_event['today']:
-        special_offset, special_dimensions = _special_event_draw(image, draw, special_event['today'], footer_offset, special_font)
+    if context['today']['special_event'] and 'msg' in context['today']['special_event']:
+        special_offset, special_dimensions = _special_event_draw(image, draw, context['today']['special_event'], footer_offset, special_font)
 
     cal_bottom = (special_offset[1] if special_offset else (footer_offset[1])) - 1
 
     # 1st Column
-    if weather: _weather_draw_today(image, draw, weather['current'], weather['forecast']['today'], header_font, temp_font)
-    if calendar: _calendar_draw_day(image, draw, calendar['today'], (0, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
+    if context['today']['conditions'] and context['today']['forecast']: _weather_draw_today(image, draw, context['today']['conditions'], context['today']['forecast'], header_font, temp_font)
+    if context['today']['events']: _calendar_draw_day(image, draw, context['today']['events'], (0, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     # 2nd Column
     draw.line([(COLUMN_WIDTH, 0), (COLUMN_WIDTH, cal_bottom)], width=1, fill=BLACK)
-    if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH, weather['forecast']['plus_one'], header_font, temp_font)
-    if calendar: _calendar_draw_day(image, draw, calendar['plus_one'], (COLUMN_WIDTH, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
+    if context['plus_one']['forecast']: _weather_draw_forecast(image, draw, COLUMN_WIDTH, context['plus_one']['forecast'], header_font, temp_font)
+    if context['plus_one']['events']: _calendar_draw_day(image, draw, context['plus_one']['events'], (COLUMN_WIDTH, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     # 3rd Column
     draw.line([(COLUMN_WIDTH*2, 0), (COLUMN_WIDTH*2, cal_bottom)], width=1, fill=BLACK)
-    if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH*2, weather['forecast']['plus_two'], header_font, temp_font)
-    if calendar: _calendar_draw_day(image, draw, calendar['plus_two'], (COLUMN_WIDTH*2, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
+    if context['plus_two']['forecast']: _weather_draw_forecast(image, draw, COLUMN_WIDTH*2, context['plus_two']['forecast'], header_font, temp_font)
+    if context['plus_two']['events']: _calendar_draw_day(image, draw, context['plus_two']['events'], (COLUMN_WIDTH*2, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     # 4th Column
     draw.line([(COLUMN_WIDTH*3, 0), (COLUMN_WIDTH*3, cal_bottom)], width=1, fill=BLACK)
-    if weather: _weather_draw_forecast(image, draw, COLUMN_WIDTH*3, weather['forecast']['plus_three'], header_font, temp_font)
-    if calendar: _calendar_draw_day(image, draw, calendar['plus_three'], (COLUMN_WIDTH*3, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
+    if context['plus_three']['forecast']: _weather_draw_forecast(image, draw, COLUMN_WIDTH*3, context['plus_three']['forecast'], header_font, temp_font)
+    if context['plus_three']['events']: _calendar_draw_day(image, draw, context['plus_three']['events'], (COLUMN_WIDTH*3, CALENDAR_TOP), cal_bottom, cal_time_font, cal_text_font)
 
     return image

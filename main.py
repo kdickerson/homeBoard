@@ -1,30 +1,47 @@
 from home_board import weather, calendar, special_events, compositor, util
 import datetime
+import pytz
 import os
 import sys
 
+TIME_ZONE = "America/Los_Angeles"
+
 def make_image():
+    days = ['today', 'plus_one', 'plus_two', 'plus_three']
+    context = {day: {'conditions': None, 'forecast': None, 'events': [], 'special_event': None} for day in days}
+    tz = pytz.timezone(TIME_ZONE)
+    now = tz.localize(datetime.datetime.now())
+    context['updated'] = 'Updated ' + datetime.datetime.now().strftime('%B %-m, %-I:%M %p')
+    context['today']['date'] = now.date()
+    context['plus_one']['date'] = context['today']['date'] + datetime.timedelta(days=1)
+    context['plus_two']['date'] = context['today']['date'] + datetime.timedelta(days=2)
+    context['plus_three']['date'] = context['today']['date'] + datetime.timedelta(days=3)
+
     try:
         conditions = weather.fetch()
+        context['today']['conditions'] = conditions['current']
+        for day in days:
+            context[day]['forecast'] = conditions['forecast'][day]
     except Exception as ex:
         print('Exception while fetching Weather')
         print(ex)
-        conditions = None
 
     try:
         calender_events = calendar.fetch()
+        for day in days:
+            context[day]['events'] = calender_events[day]
     except Exception as ex:
         print('Exception while fetching Calendar')
         print(ex)
-        calender_events = None
 
     try:
         special_event = special_events.fetch()
+        for day in days:
+            context[day]['special_event'] = special_event[day]
     except Exception as ex:
         print('Exception while fetching Special Events')
         print(ex)
-        special_event = None
-    return compositor.create(conditions, calender_events, special_event)
+    return compositor.create(context)
 
 def display_image():
     from waveshare import epd7in5b
