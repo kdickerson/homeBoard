@@ -169,10 +169,11 @@ def create(weather, calendar, special_event):
         footer_offset, footer_dimensions = _footer_draw(image, draw, weather['current']['time'], footer_font)
 
     # Special event, centered across whole display, above footer
-    if special_event and 'msg' in special_event:
-        special_offset, special_dimensions = _special_event_draw(image, draw, special_event, footer_offset, special_font)
+    special_offset = None
+    if special_event and special_event['today'] is not None and 'msg' in special_event['today']:
+        special_offset, special_dimensions = _special_event_draw(image, draw, special_event['today'], footer_offset, special_font)
 
-    cal_bottom = (special_offset[1] if special_event else (footer_offset[1])) - 1
+    cal_bottom = (special_offset[1] if special_offset else (footer_offset[1])) - 1
 
     # 1st Column
     if weather: _weather_draw_today(image, draw, weather['current'], weather['forecast']['today'], header_font, temp_font)

@@ -15,7 +15,18 @@ EVENTS = [
     {'month': 12, 'day': 31, 'title': 'New Years Eve'},
 ]
 
+def _find_event_for_day(day):
+    return next((e for e in EVENTS if day.month is e['month'] and day.day is e['day'] and ('year' not in e or day.year is e['year'])), None)
+
 def fetch():
-    now = datetime.date.today()
-    #now = datetime.date(2018, 12, 25)
-    return next((e for e in EVENTS if now.month is e['month'] and now.day is e['day'] and ('year' not in e or now.year is e['year'])), None)
+    #today = datetime.date(2018, 12, 25)
+    today = datetime.date.today()
+    plus_one = today + datetime.timedelta(days=1)
+    plus_two = plus_one + datetime.timedelta(days=1)
+    plus_three = plus_two + datetime.timedelta(days=1)
+    return {
+        'today': _find_event_for_day(today),
+        'plus_one': _find_event_for_day(plus_one),
+        'plus_two': _find_event_for_day(plus_two),
+        'plus_three': _find_event_for_day(plus_three),
+    }
