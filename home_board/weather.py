@@ -25,10 +25,6 @@ def _extract_cleaned_forecast(day_idx, forecasts):
         'high-temperature': forecasts[day_idx]['high']['fahrenheit'],
         'description': forecasts[day_idx]['conditions'],
         'icon': forecasts[day_idx]['icon'],
-        'weekday': forecasts[day_idx]['date']['weekday_short'],
-        'month': forecasts[day_idx]['date']['month'],
-        'day': forecasts[day_idx]['date']['day'],
-        'monthname_short': forecasts[day_idx]['date']['monthname_short'],
     }
 
 def _wunderground_data():
