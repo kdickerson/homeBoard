@@ -6,6 +6,14 @@ import sys
 
 TIME_ZONE = "America/Los_Angeles"
 
+def _dst_start_end(tz_aware_when):
+    dst_start_utc, dst_end_utc = [dt for dt in tz_aware_when.tzinfo._utc_transition_times if dt.year == tz_aware_when.year]
+    dst_start_tran_info = tz_aware_when.tzinfo._transition_info[tz_aware_when.tzinfo._utc_transition_times.index(dst_start_utc)]
+    dst_end_tran_info = tz_aware_when.tzinfo._transition_info[tz_aware_when.tzinfo._utc_transition_times.index(dst_end_utc)]
+    dst_start_local = tz_aware_when.tzinfo.localize(dst_start_utc + dst_start_tran_info[0])
+    dst_end_local = tz_aware_when.tzinfo.localize(dst_end_utc + dst_end_tran_info[0])
+    return dst_start_local, dst_end_local
+
 def make_image():
     days = ['today', 'plus_one', 'plus_two', 'plus_three']
     context = {day: {'conditions': None, 'forecast': None, 'events': [], 'special_event': None} for day in days}
@@ -47,6 +55,24 @@ def make_image():
     except Exception as ex:
         print('Exception while fetching Special Events')
         print(ex)
+
+    # Check Daylight Saving Time:
+    try:
+        dst_start_local, dst_end_local = _dst_start_end(context['now'])
+        dst_start_local = dst_start_local.date()
+        dst_end_local = dst_end_local.date()
+        for day in days:
+            if context[day]['date'] == dst_start_local or context[day]['date'] == dst_end_local:
+                context[day]['events'].insert(0, {
+                    'calendar_label': '',
+                    'all_day': True,
+                    'description': 'DST ' + ('Starts' if context[day]['date'] == dst_start_local else 'Ends'),
+                    'underway': day == 'today',
+                })
+    except Exception as ex:
+        print('Exception while processing Daylight Saving Time')
+        print(ex)
+
     return compositor.create(context)
 
 def display_image():
