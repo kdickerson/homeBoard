@@ -3,6 +3,7 @@ import os
 _base_path = './'
 
 def set_base_path(path):
+    global _base_path
     _base_path = path
 
 def local_file(path_relative_to_project_base):
