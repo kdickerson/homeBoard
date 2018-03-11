@@ -179,7 +179,7 @@ def create(context):
 
     # 1st Column
     left = COLUMNS[0]
-    _draw_header(draw, (left, HEADER_TOP), context['today']['date'].strftime('%b %-m'), fonts['header'], RED)
+    _draw_header(draw, (left, HEADER_TOP), context['today']['date'].strftime('%b %-d'), fonts['header'], RED)
     if context['today']['conditions'] and context['today']['forecast']: _draw_forecast_and_current(image, draw, context['today']['conditions'], context['today']['forecast'], fonts['header'], fonts['temperature'])
     if context['today']['events']: _draw_calendar(image, draw, context['today']['events'], (left, CALENDAR_TOP), cal_bottom, fonts['calendar_header'], fonts['calendar_body'])
 
