@@ -37,7 +37,7 @@ def make_image():
         special_event = special_events.fetch(context['today']['date'])
         for day in days:
             context[day]['special_event'] = special_event[day]
-            if special_event[day] and day is not 'today':
+            if special_event[day] and day != 'today':
                 context[day]['events'].insert(0, {
                     'calendar_label': '',
                     'all_day': True,

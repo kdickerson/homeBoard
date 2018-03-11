@@ -83,7 +83,7 @@ def _draw_calendar(image, draw, events, offset, bottom, time_font, description_f
         time, time_dim = _truncate_text(draw, header, time_font, COLUMN_WIDTH - right_margin - time_left_margin)
         desc, desc_dim = _truncate_text(draw, event['description'], description_font, COLUMN_WIDTH - right_margin - text_left_margin)
 
-        if top + time_dim[1] + desc_dim[1] + (0 if idx+1 is len(events) else more_msg_height) > bottom:
+        if top + time_dim[1] + desc_dim[1] + (0 if idx+1 == len(events) else more_msg_height) > bottom:
             more_msg = '+' + str(len(events) - idx) + ' More'
             _draw_centered_text(draw, (offset[0], top), COLUMN_WIDTH, more_msg, description_font)
             break
