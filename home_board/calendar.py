@@ -1,8 +1,8 @@
 # Fetch calendaring info from Google, process, and return
-import ast
 import datetime
 import dateutil.parser
 import httplib2
+import json
 import os
 import pytz
 from .util import local_file
@@ -18,7 +18,7 @@ CLIENT_SECRET_FILE = 'private/google_calendar.key'
 CREDENTIALS_FILE = 'private/google_calendar_credentials.key'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 MOCK_GOOGLE_CALENDAR_DATA = False
-MOCK_GOOGLE_CALENDAR_DATA_FILE = 'mock_data/mock_google_calendar_data.py.txt'
+MOCK_GOOGLE_CALENDAR_DATA_FILE = 'mock_data/mock_google_calendar_data.json'
 
 # See list_calendars() to get a list of available IDs
 CALENDARS = [
@@ -56,7 +56,7 @@ def _get_credentials():
 def _request_data(tz_aware_when, calendar, timezone):
     if MOCK_GOOGLE_CALENDAR_DATA:
         with open(local_file(MOCK_GOOGLE_CALENDAR_DATA_FILE)) as mock_data:
-            eventsResult = ast.literal_eval(mock_data.read())
+            eventsResult = json.load(mock_data)[calendar['id']]
     else:
         credentials = _get_credentials()
         http = credentials.authorize(httplib2.Http())
