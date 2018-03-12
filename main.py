@@ -14,16 +14,16 @@ def _dst_start_end(tz_aware_when):
     dst_end_local = tz_aware_when.tzinfo.localize(dst_end_utc + dst_end_tran_info[0])
     return dst_start_local, dst_end_local
 
-def make_image():
-    days = ['today', 'plus_one', 'plus_two', 'plus_three']
-    context = {day: {'conditions': None, 'forecast': None, 'events': [], 'special_event': None} for day in days}
-    tz = pytz.timezone(TIME_ZONE)
-    context['now'] = tz.localize(datetime.datetime.now())
-    context['today']['date'] = context['now'].date()
-    context['plus_one']['date'] = context['today']['date'] + datetime.timedelta(days=1)
-    context['plus_two']['date'] = context['today']['date'] + datetime.timedelta(days=2)
-    context['plus_three']['date'] = context['today']['date'] + datetime.timedelta(days=3)
+def fetch_calendar(context, days):
+    try:
+        calender_events = calendar.fetch(context['now'])
+        for day in days:
+            context[day]['events'] = calender_events[day]
+    except Exception as ex:
+        print('Exception while fetching Calendar')
+        print(ex)
 
+def fetch_weather(context, days):
     try:
         conditions = weather.fetch() # weather can only fetch conditions and forecast for "now"
         context['today']['conditions'] = conditions['current']
@@ -33,14 +33,7 @@ def make_image():
         print('Exception while fetching Weather')
         print(ex)
 
-    try:
-        calender_events = calendar.fetch(context['now'])
-        for day in days:
-            context[day]['events'] = calender_events[day]
-    except Exception as ex:
-        print('Exception while fetching Calendar')
-        print(ex)
-
+def fetch_special_events(context, days):
     try:
         special_event = special_events.fetch(context['today']['date'])
         for day in days:
@@ -56,7 +49,7 @@ def make_image():
         print('Exception while fetching Special Events')
         print(ex)
 
-    # Check Daylight Saving Time:
+def fetch_daylight_saving_time(context, days):
     try:
         dst_start_local, dst_end_local = _dst_start_end(context['now'])
         dst_start_local = dst_start_local.date()
@@ -73,6 +66,24 @@ def make_image():
         print('Exception while processing Daylight Saving Time')
         print(ex)
 
+def fetch_data():
+    days = ['today', 'plus_one', 'plus_two', 'plus_three']
+    context = {day: {'conditions': None, 'forecast': None, 'events': [], 'special_event': None} for day in days}
+    tz = pytz.timezone(TIME_ZONE)
+    context['now'] = tz.localize(datetime.datetime.now())
+    context['today']['date'] = context['now'].date()
+    context['plus_one']['date'] = context['today']['date'] + datetime.timedelta(days=1)
+    context['plus_two']['date'] = context['today']['date'] + datetime.timedelta(days=2)
+    context['plus_three']['date'] = context['today']['date'] + datetime.timedelta(days=3)
+
+    fetch_weather(context, days)
+    fetch_calendar(context, days)
+    fetch_special_events(context, days)
+    fetch_daylight_saving_time(context, days)
+    return context
+
+def make_image():
+    context = fetch_data()
     return compositor.create(context)
 
 def display_image():
