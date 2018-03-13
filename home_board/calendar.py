@@ -28,6 +28,7 @@ CALENDARS = [
     {'id': 'jpsmb71hrr2fvqo3l9ffpo3ca8@group.calendar.google.com', 'label': 'Corinne'},
     {'id': 'gdh9plpc638531bfj3epe7gal8@group.calendar.google.com', 'label': 'LLNL'},
     {'id': '18beqncm6ftugft30sfb23epjg@group.calendar.google.com', 'label': 'Rancho'},
+    {'id': 'en.usa#holiday@group.v.calendar.google.com', 'label': 'Holidays'}
 ]
 
 def _get_credentials_store():
