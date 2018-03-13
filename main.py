@@ -108,7 +108,7 @@ def fetch_data():
     fetch_weather(context, days)
     fetch_calendar(context, days)
     fetch_special_events(context, days)
-    fetch_daylight_saving_time(context, days)
+    #fetch_daylight_saving_time(context, days)
     return context
 
 def make_image():
