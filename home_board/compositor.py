@@ -71,7 +71,7 @@ def _truncate_text(draw, text, font, width):
 def _draw_header(draw, offset, text, font, color=BLACK):
     _draw_centered_text(draw, offset, COLUMN_WIDTH, text, font, color)
 
-def _draw_calendar(image, draw, events, offset, bottom, time_font, description_font):
+def _draw_calendar(image, draw, events, offset, bottom, cal_header_font, description_font):
     time_left_margin = 5
     text_left_margin = 5
     right_margin = 5
@@ -79,17 +79,17 @@ def _draw_calendar(image, draw, events, offset, bottom, time_font, description_f
     top = offset[1]
     more_msg_height = draw.textsize('+123456789 More', font=description_font)[1] # Max height for "+X More" msg
     for idx, event in enumerate(events):
-        header = ('' if event['all_day'] else event['start'].strftime('%-H:%M') + ' ') + event['calendar_label'] # %-H is Linux specific
-        time, time_dim = _truncate_text(draw, header, time_font, COLUMN_WIDTH - right_margin - time_left_margin)
+        header_txt = ('' if event['all_day'] else event['start'].strftime('%-H:%M') + ' ') + event['calendar_label'] # %-H is Linux specific
+        header, header_dim = _truncate_text(draw, header_txt, cal_header_font, COLUMN_WIDTH - right_margin - time_left_margin)
         desc, desc_dim = _truncate_text(draw, event['description'], description_font, COLUMN_WIDTH - right_margin - text_left_margin)
 
-        if top + time_dim[1] + desc_dim[1] + (0 if idx+1 == len(events) else more_msg_height) > bottom:
+        if top + header_dim[1] + desc_dim[1] + (0 if idx+1 == len(events) else more_msg_height) > bottom:
             more_msg = '+' + str(len(events) - idx) + ' More'
             _draw_centered_text(draw, (offset[0], top), COLUMN_WIDTH, more_msg, description_font)
             break
-        draw.text((offset[0] + time_left_margin, top), time, font=time_font, fill=RED if event['underway'] else BLACK)
-        draw.text((offset[0] + text_left_margin, top + time_dim[1]), desc, font=description_font, fill=RED if event['underway'] else BLACK)
-        top = top + time_dim[1] + desc_dim[1] + bottom_margin
+        draw.text((offset[0] + time_left_margin, top), header, font=cal_header_font, fill=RED if event['underway'] else BLACK)
+        draw.text((offset[0] + text_left_margin, top + header_dim[1]), desc, font=description_font, fill=RED if event['underway'] else BLACK)
+        top = top + header_dim[1] + desc_dim[1] + bottom_margin
 
 def _draw_forecast_and_current(image, draw, conditions, forecast, header_font, temp_font):
     SUB_COLUMN_WIDTH = COLUMN_WIDTH // 2
