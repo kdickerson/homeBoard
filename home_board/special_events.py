@@ -4,6 +4,7 @@ import datetime
 EVENTS = [
     {'month': 3, 'day': 17, 'title': 'Corinne\'s Birthday', 'msg': 'Happy Birthday, Corinne!', 'icon': 'birthday'},
     {'month': 6, 'day': 9, 'title': 'Kyle\'s Birthday', 'msg': 'Happy Birthday, Kyle!', 'icon': 'birthday'},
+    {'month': 6, 'day': 23, 'title': 'Anniversary', 'msg': 'Happy Anniversary!', 'icon': 'birthday'},
     {'month': 9, 'day': 20, 'title': 'Jess\' Birthday', 'msg': 'Happy Birthday, Jess!', 'icon': 'birthday'},
     {'month': 10, 'day': 28, 'title': 'Heather\'s Birthday', 'msg': 'Happy Birthday, Heather!', 'icon': 'birthday'},
     {'month': 10, 'day': 31, 'msg': 'Happy Halloween!', 'icon': 'halloween'},
