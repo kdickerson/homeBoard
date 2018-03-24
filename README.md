@@ -38,3 +38,10 @@ Calendar events that are currently happening are displayed in red.
 Special Event messages are displayed in red.
 
 Original icons from flaticons.net and then modified.
+
+Example Crontab entries:
+
+    > # Update every 15 minutes during the day
+    > */15 7-21 * * * /home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard
+    > # Only update once per hour overnight
+    > 0 22-23,0-6 * * * /home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard
