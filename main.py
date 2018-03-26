@@ -67,7 +67,7 @@ def fetch_special_events(context, days):
                     pickle.dump(special_event, mock_data)
         for day in days:
             context[day]['special_event'] = special_event[day]
-            if special_event[day] and 'title' in special_event[day] and day != 'today':
+            if special_event[day] and 'title' in special_event[day] and (day != 'today' or 'msg' not in special_event[day]):
                 context[day]['events'].insert(0, {
                     'calendar_label': special_event[day]['header'] if special_event[day]['header'] else '',
                     'all_day': True,
