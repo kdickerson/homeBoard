@@ -34,6 +34,8 @@ def fetch_calendar(context, days):
                     pickle.dump(calender_events, mock_data)
         for day in days:
             context[day]['events'] = calender_events[day]
+            for event in context[day]['events']:
+                event['underway'] = event['start'] < context['now'] and context['now'] < event['end']
     except Exception as ex:
         print('Exception while fetching Calendar')
         print(ex)
