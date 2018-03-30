@@ -25,6 +25,16 @@ EVENTS = [
     {'month': 10, 'day': 31, 'msg': 'Happy Halloween!', 'icon': 'halloween'},
     {'month': 12, 'day': 25, 'msg': 'Merry Christmas!', 'icon': 'christmas'},
     {'year': 2018, 'month': 11, 'day': 22, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
+    # Seasons 2018:
+    {'year': 2018, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
+    {'year': 2018, 'month': 6, 'day': 21, 'header': 'Season', 'title': 'Summer'},
+    {'year': 2018, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
+    {'year': 2018, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+    # Seasons 2019:
+    {'year': 2019, 'month': 3, 'day': 21, 'header': 'Season', 'title': 'Spring'},
+    {'year': 2019, 'month': 6, 'day': 21, 'header': 'Season', 'title': 'Summer'},
+    {'year': 2019, 'month': 9, 'day': 23, 'header': 'Season', 'title': 'Fall'},
+    {'year': 2019, 'month': 12, 'day': 22, 'header': 'Season', 'title': 'Winter'},
 ]
 
 def _find_event_for_day(day):
