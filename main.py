@@ -74,7 +74,7 @@ def fetch_special_events(context, days):
                     'calendar_label': special_event[day]['header'] if special_event[day]['header'] else '',
                     'all_day': True,
                     'description': special_event[day]['title'],
-                    'underway': False,
+                    'underway': day == 'today',
                 })
     except Exception as ex:
         print('Exception while fetching Special Events')
