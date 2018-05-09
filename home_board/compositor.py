@@ -79,7 +79,16 @@ def _draw_calendar(image, draw, events, offset, bottom, cal_header_font, descrip
     top = offset[1]
     more_msg_height = draw.textsize('+123456789 More', font=description_font)[1] # Max height for "+X More" msg
     for idx, event in enumerate(events):
-        header_txt = ('' if event['all_day'] else event['start'].strftime('%-H:%M') + ' ') + event['calendar_label'] # %-H is Linux specific
+        header_txt = ''
+        # Make sure we don't show start times for events that started a previous date, don't show end times for events ending a future date
+        if not event['all_day']:
+            if event['underway']:
+                if event['ending_today']:
+                    header_txt = '→' + event['end'].strftime('%-H:%M') + ' ' # %-H is Linux specific
+            else:
+                header_txt = event['start'].strftime('%-H:%M') + ' ' # %-H is Linux specific
+        header_txt += event['calendar_label']
+
         header, header_dim = _truncate_text(draw, header_txt, cal_header_font, COLUMN_WIDTH - right_margin - time_left_margin)
         desc, desc_dim = _truncate_text(draw, event['description'], description_font, COLUMN_WIDTH - right_margin - text_left_margin)
 

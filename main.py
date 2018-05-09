@@ -36,6 +36,7 @@ def fetch_calendar(context, days):
             context[day]['events'] = calender_events[day]
             for event in context[day]['events']:
                 event['underway'] = event['start'] < context['now'] and context['now'] < event['end']
+                event['ending_today'] = event['end'].date() == context['now'].date()
     except Exception as ex:
         print('Exception while fetching Calendar')
         print(ex)
