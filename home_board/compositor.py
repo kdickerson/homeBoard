@@ -83,8 +83,10 @@ def _draw_calendar(image, draw, events, offset, bottom, cal_header_font, descrip
         # Make sure we don't show start times for events that started a previous date, don't show end times for events ending a future date
         if not event['all_day']:
             if event['underway']:
-                if event['ending_today']:
+                if event['ending_days_away'] == 0:
                     header_txt = '→' + event['end'].strftime('%-H:%M') + ' ' # %-H is Linux specific
+                elif event['ending_days_away'] > 0:
+                    header_txt = '+' + str(event['ending_days_away']) + ' Day' + ('' if event['ending_days_away'] == 1 else 's') + ' ' # %-H is Linux specific
             else:
                 header_txt = event['start'].strftime('%-H:%M') + ' ' # %-H is Linux specific
         header_txt += event['calendar_label']
