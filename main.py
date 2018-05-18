@@ -125,7 +125,7 @@ def fetch_data():
     if CACHE_FILE and not all (context['success'].values()):
         try:
             with open(CACHE_FILE, 'rb') as cache_file:
-                context = _context
+                _context = context
                 context = pickle.load(cache_file)
                 context.update(_context)
         except:
