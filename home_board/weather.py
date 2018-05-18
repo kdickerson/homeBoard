@@ -21,8 +21,8 @@ def _request_data(api_key, pws_id):
 
 def _extract_cleaned_forecast(day_idx, forecasts):
     return {
-        'low-temperature': forecasts[day_idx]['low']['fahrenheit'],
-        'high-temperature': forecasts[day_idx]['high']['fahrenheit'],
+        'low-temperature': int(forecasts[day_idx]['low']['fahrenheit']),
+        'high-temperature': int(forecasts[day_idx]['high']['fahrenheit']),
         'description': forecasts[day_idx]['conditions'],
         'icon': forecasts[day_idx]['icon'],
     }
