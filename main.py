@@ -14,6 +14,7 @@ MOCK_SPECIAL_EVENTS = False
 MOCK_CALENDAR_FILE = 'mock_data/mock_calendar_data.pickle'
 MOCK_WEATHER_FILE = 'mock_data/mock_weather_data.pickle'
 MOCK_SPECIAL_EVENTS_FILE = 'mock_data/mock_special_events_data.pickle'
+CACHE_FILE = None #'/ram-tmp/home_board.cache'
 
 def _dst_start_end(tz_aware_when):
     dst_start_utc, dst_end_utc = [dt for dt in tz_aware_when.tzinfo._utc_transition_times if dt.year == tz_aware_when.year]
@@ -119,6 +120,25 @@ def fetch_data():
     fetch_special_events(context, days)
     #fetch_daylight_saving_time(context, days)
     context['success']['dst'] = True
+
+    # Use cache to fill in any missing info
+    if CACHE_FILE and not all (context['success'].values()):
+        try:
+            with open(CACHE_FILE, 'rb') as cache_file:
+                context = _context
+                context = pickle.load(cache_file)
+                context.update(_context)
+        except:
+            logging.exception('Exception loading data from cache_file: ' + str(CACHE_FILE))
+
+    # Update cache
+    if (CACHE_FILE):
+        try:
+            with open(CACHE_FILE, 'wb') as cache_file:
+                pickle.dump(context, cache_file)
+        except:
+            logging.exception('Exception writing data to cache_file: ' + str(CACHE_FILE))
+
     return context
 
 def make_image():
