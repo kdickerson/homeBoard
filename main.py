@@ -129,7 +129,7 @@ def fetch_data():
                 context = pickle.load(cache_file)
                 context.update(_context)
         except:
-            logging.exception('Exception loading data from cache_file: ' + str(CACHE_FILE))
+            logging.exception('Exception loading data from cache_file: ' + str(CACHE_FILE) + '.  Needed data for:' + ','.join(sorted([k for k, v in context['success'].items() if not v])))
 
     # Update cache
     if (CACHE_FILE):
