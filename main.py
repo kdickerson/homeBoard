@@ -83,7 +83,7 @@ def fetch_special_events(context, days):
                     'description': special_event[day]['title'],
                     'underway': day == 'today',
                 })
-                context['success']['special_events'] = True
+        context['success']['special_events'] = True
     except Exception as ex:
         logging.exception('Exception while fetching Special Events')
 
