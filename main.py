@@ -1,5 +1,6 @@
 from home_board import weather, calendar, special_events, compositor, util
 import datetime
+import logging
 import os
 import pickle
 import pytz
@@ -38,8 +39,7 @@ def fetch_calendar(context, days):
                 event['underway'] = event['start'] < context['now'] and context['now'] < event['end']
                 event['ending_days_away'] = (event['end'].date() - context[day]['date']).days
     except Exception as ex:
-        print('Exception while fetching Calendar')
-        print(ex)
+        logging.exception('Exception while fetching Calendar')
 
 def fetch_weather(context, days):
     try:
@@ -55,8 +55,7 @@ def fetch_weather(context, days):
         for day in days:
             context[day]['forecast'] = conditions['forecast'][day]
     except Exception as ex:
-        print('Exception while fetching Weather')
-        print(ex)
+        logging.exception('Exception while fetching Weather')
 
 def fetch_special_events(context, days):
     try:
@@ -78,8 +77,7 @@ def fetch_special_events(context, days):
                     'underway': day == 'today',
                 })
     except Exception as ex:
-        print('Exception while fetching Special Events')
-        print(ex)
+        logging.exception('Exception while fetching Special Events')
 
 def fetch_daylight_saving_time(context, days):
     try:
@@ -95,8 +93,7 @@ def fetch_daylight_saving_time(context, days):
                     'underway': day == 'today',
                 })
     except Exception as ex:
-        print('Exception while processing Daylight Saving Time')
-        print(ex)
+        logging.exception('Exception while processing Daylight Saving Time')
 
 def fetch_data():
     days = ['today', 'plus_one', 'plus_two', 'plus_three']
