@@ -25,6 +25,7 @@
         },
         "httplib2": {
             "hashes": [
+                "sha256:90484f5a329cf932d0f5a613672820bdbb2c61593b3dbd9afe953b829e388be6",
                 "sha256:e404d3b7bd86c1bc931906098e7c1305d6a3a6dcef141b8bb1059903abb3ceeb"
             ],
             "version": "==0.10.3"
@@ -62,7 +63,9 @@
                 "sha256:b85f703c2ffe539313e39ce0676bed0f355cec45a16e58c9ab7417445843047c",
                 "sha256:b9f63451084a718eccdeb1e382768c94647915653af4d6019f64560d9e98642b",
                 "sha256:c793dfaa130847ccff958492b76ae8b9304e60b8a79a92962cb19e368276a22b",
-                "sha256:ddd16ab250b4fc97db1c47407e78c25216a75c29d29d10ad37e51b7a2ec7b2c3"
+                "sha256:ddd16ab250b4fc97db1c47407e78c25216a75c29d29d10ad37e51b7a2ec7b2c3",
+                "sha256:f2ed2c0e7b58f07c3c923b5d10b932052e71664e76071f2d27fd26877eba23d9",
+                "sha256:fda63365f357085164070ee887a946cb01ab3f21a7937ca71c1da5251e5a43bf"
             ],
             "version": "==5.0.0"
         },
@@ -96,6 +99,8 @@
         },
         "rpi.gpio": {
             "hashes": [
+                "sha256:51379ab1ca5badc92e165232e2428046addd46bf3d3f29fb8cf3db4c5c8b97cd",
+                "sha256:6e73d35bf526fa284dd84b034eaba096a809411d4eaf90098795bb6ae78e60b4",
                 "sha256:a5fc0eb5e401963b6c0a03650da6b42c4005f02d962b81241d96c98d0a578516"
             ],
             "version": "==0.6.3"
@@ -116,7 +121,9 @@
         },
         "spidev": {
             "hashes": [
-                "sha256:09d2b5122f0dd79910713a11f9a0020f71537224bf829916def4fffc0ea59456"
+                "sha256:09d2b5122f0dd79910713a11f9a0020f71537224bf829916def4fffc0ea59456",
+                "sha256:f36db7af65fd754f7a931af825eaada3d9168e7d063d9738c6a3b26f5ad31145",
+                "sha256:f94b272a318b4566e4e8454cd6fbd9ffec9e6639f2b6250b2541fb7932ece53a"
             ],
             "version": "==3.2"
         },
