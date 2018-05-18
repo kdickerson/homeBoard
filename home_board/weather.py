@@ -25,6 +25,7 @@ def _extract_cleaned_forecast(day_idx, forecasts):
         'high-temperature': int(forecasts[day_idx]['high']['fahrenheit']),
         'description': forecasts[day_idx]['conditions'],
         'icon': forecasts[day_idx]['icon'],
+        'epoch': float(forecasts[day_idx]['date']['epoch']),
     }
 
 def _wunderground_data():

@@ -52,6 +52,10 @@ def fetch_weather(context, days):
             if SAVE_MOCK:
                 with open(util.local_file(MOCK_WEATHER_FILE), 'wb') as mock_data:
                     pickle.dump(conditions, mock_data)
+            # Test date of forecast and throw away if not correct
+            forecast_date = datetime.datetime.fromtimestamp(conditions['forecast']['today']['epoch'], context['now'].tzinfo)
+            if forecast_date.date() != context['now'].date():
+                raise ValueError("Weather forecast date is not accurate. Received " + forecast_date.date().strftime('%Y-%m-%d'))
         context['today']['conditions'] = conditions['current']
         for day in days:
             context[day]['forecast'] = conditions['forecast'][day]
