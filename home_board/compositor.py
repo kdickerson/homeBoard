@@ -180,7 +180,7 @@ def create(context):
     # Footer: Bottom-right corner
     updated_msg = 'Updated ' + context['now'].strftime('%B %-d, %-I:%M %p') # %-d and %-I are platform specific
     if not all (context['success'].values()):
-        updated_msg = '[!] ' + updated_msg
+        updated_msg = '[! ' + ','.join(sorted([k for k, v in context['success'].items() if not v])) + ']' + updated_msg
     footer_offset, footer_dimensions = _draw_footer(image, draw, updated_msg, fonts['footer'])
 
     # Special event, centered across whole display, above footer
