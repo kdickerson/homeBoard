@@ -14,7 +14,7 @@ MOCK_SPECIAL_EVENTS = False
 MOCK_CALENDAR_FILE = 'mock_data/mock_calendar_data.pickle'
 MOCK_WEATHER_FILE = 'mock_data/mock_weather_data.pickle'
 MOCK_SPECIAL_EVENTS_FILE = 'mock_data/mock_special_events_data.pickle'
-CACHE_FILE = None #'/ram-tmp/home_board.cache'
+CACHE_FILE = '/ram-tmp/home_board.cache'
 
 def _dst_start_end(tz_aware_when):
     dst_start_utc, dst_end_utc = [dt for dt in tz_aware_when.tzinfo._utc_transition_times if dt.year == tz_aware_when.year]
