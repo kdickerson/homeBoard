@@ -38,6 +38,7 @@ def fetch_calendar(context, days):
             for event in context[day]['events']:
                 event['underway'] = event['start'] < context['now'] and context['now'] < event['end']
                 event['ending_days_away'] = (event['end'].date() - context[day]['date']).days
+        context['success']['calendar'] = True
     except Exception as ex:
         logging.exception('Exception while fetching Calendar')
 
@@ -54,6 +55,7 @@ def fetch_weather(context, days):
         context['today']['conditions'] = conditions['current']
         for day in days:
             context[day]['forecast'] = conditions['forecast'][day]
+        context['success']['weather'] = True
     except Exception as ex:
         logging.exception('Exception while fetching Weather')
 
@@ -76,6 +78,7 @@ def fetch_special_events(context, days):
                     'description': special_event[day]['title'],
                     'underway': day == 'today',
                 })
+                context['success']['special_events'] = True
     except Exception as ex:
         logging.exception('Exception while fetching Special Events')
 
@@ -92,12 +95,14 @@ def fetch_daylight_saving_time(context, days):
                     'description': 'DST ' + ('Starts' if context[day]['date'] == dst_start_local else 'Ends'),
                     'underway': day == 'today',
                 })
+        context['success']['dst'] = True
     except Exception as ex:
         logging.exception('Exception while processing Daylight Saving Time')
 
 def fetch_data():
     days = ['today', 'plus_one', 'plus_two', 'plus_three']
     context = {day: {'conditions': None, 'forecast': None, 'events': [], 'special_event': None} for day in days}
+    context['success'] = {'calendar': False, 'weather': False, 'special-events': False, 'dst': False}
     tz = pytz.timezone(TIME_ZONE)
     context['now'] = tz.localize(datetime.datetime.now())
     context['today']['date'] = context['now'].date()
@@ -109,6 +114,7 @@ def fetch_data():
     fetch_calendar(context, days)
     fetch_special_events(context, days)
     #fetch_daylight_saving_time(context, days)
+    context['success']['dst'] = True
     return context
 
 def make_image():
