@@ -62,7 +62,7 @@ def _request_data(tz_aware_when, calendar, timezone):
     else:
         credentials = _get_credentials()
         http = credentials.authorize(httplib2.Http())
-        service = discovery.build('calendar', 'v3', http=http)
+        service = discovery.build('calendar', 'v3', http=http, cache_discovery=False)
         # Issues with all-day events not being returned by Google after the UTC date rolls over to tomorrow, even though the local time is still today
         # So we'll just ask for everything today, and filter it locally.  Not great, but I'm not seeing a better solution
         start_of_day = tz_aware_when.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(pytz.utc).isoformat()
