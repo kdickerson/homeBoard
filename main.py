@@ -25,7 +25,7 @@ def deep_defaults(target, source):
     for k, v in source.items():
         if (k in target and isinstance(target[k], dict) and isinstance(source[k], collections.Mapping)):
             deep_defaults(target[k], source[k])
-        elif not target[k]:
+        elif k not in target or target[k] is None:
             target[k] = source[k]
 
 def _dst_start_end(tz_aware_when):
