@@ -1,5 +1,6 @@
 from home_board import weather, calendar, special_events, compositor, util
 import datetime
+import collections
 import logging
 import os
 import pickle
@@ -15,6 +16,17 @@ MOCK_CALENDAR_FILE = 'mock_data/mock_calendar_data.pickle'
 MOCK_WEATHER_FILE = 'mock_data/mock_weather_data.pickle'
 MOCK_SPECIAL_EVENTS_FILE = 'mock_data/mock_special_events_data.pickle'
 CACHE_FILE = None #'/ram-tmp/home_board.cache'
+
+def deep_defaults(target, source):
+    """
+    https://gist.github.com/angstwad/bf22d1822c38a92ec0a9
+    Modified to only fill in empty entries in target using values from source
+    """
+    for k, v in source.items():
+        if (k in target and isinstance(target[k], dict) and isinstance(source[k], collections.Mapping)):
+            deep_defaults(target[k], source[k])
+        elif not target[k]:
+            target[k] = source[k]
 
 def _dst_start_end(tz_aware_when):
     dst_start_utc, dst_end_utc = [dt for dt in tz_aware_when.tzinfo._utc_transition_times if dt.year == tz_aware_when.year]
@@ -125,14 +137,13 @@ def fetch_data():
     if CACHE_FILE and not all (context['success'].values()):
         try:
             with open(CACHE_FILE, 'rb') as cache_file:
-                _context = context
-                context = pickle.load(cache_file)
-                context.update(_context)
+                cache = pickle.load(cache_file)
+                deep_defaults(context, cache)
         except:
             logging.exception('Exception loading data from cache_file: ' + str(CACHE_FILE) + '.  Needed data for:' + ','.join(sorted([k for k, v in context['success'].items() if not v])))
 
     # Update cache
-    if (CACHE_FILE):
+    if CACHE_FILE:
         try:
             with open(CACHE_FILE, 'wb') as cache_file:
                 pickle.dump(context, cache_file)
