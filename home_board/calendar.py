@@ -61,7 +61,7 @@ def _request_data(tz_aware_when, calendar, timezone):
             eventsResult = json.load(mock_data)[calendar['id']]
     else:
         credentials = _get_credentials()
-        http = credentials.authorize(httplib2.Http())
+        http = credentials.authorize(httplib2.Http(timeout=15.0))
         service = discovery.build('calendar', 'v3', http=http, cache_discovery=False)
         # Issues with all-day events not being returned by Google after the UTC date rolls over to tomorrow, even though the local time is still today
         # So we'll just ask for everything today, and filter it locally.  Not great, but I'm not seeing a better solution
