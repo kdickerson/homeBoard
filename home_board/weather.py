@@ -14,7 +14,7 @@ def _request_data(api_key, pws_id):
             json_string = mock_data.read()
     else:
         query_url = 'http://api.wunderground.com/api/{api_key}/conditions/forecast/q/pws:{pws_id}.json'.format(api_key=api_key, pws_id=pws_id)
-        with urlopen(query_url) as response:
+        with urlopen(query_url, timeout=15) as response:
             json_string = response.read().decode('utf8')
     parsed_json = json.loads(json_string)
     return parsed_json['current_observation'], parsed_json['forecast']['simpleforecast']['forecastday']
