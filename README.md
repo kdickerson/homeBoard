@@ -45,3 +45,10 @@ Example Crontab entries:
     > */15 7-21 * * * /home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard
     > # Only update once per hour overnight
     > 0 22-23,0-6 * * * /home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard
+
+Example Crontab entries using Flock to avoid simultaneous executions (which usually result in image corruption on the display):
+
+    > # Update every 15 minutes during the day
+    > */15 7-21 * * * /usr/bin/flock -n /home/pi/homeBoard_cron.lock /home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard
+    > # Only update once per hour overnight
+    > 0 22-23,0-6 * * * /usr/bin/flock -n /home/pi/homeBoard_cron.lock /home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard
