@@ -3,6 +3,7 @@ import datetime
 import dateutil.parser
 import httplib2
 import json
+import logging
 import os
 import pytz
 from .util import local_file
@@ -33,6 +34,7 @@ CALENDARS = [
 ]
 
 def _get_credentials_store():
+    logging.debug('_get_credentials_store')
     credential_path = local_file(CREDENTIALS_FILE)
     return Storage(credential_path)
 
@@ -47,6 +49,7 @@ def _get_credentials():
     Returns:
         Credentials, the obtained credential.
     """
+    logging.debug('_get_credentials')
     store = _get_credentials_store()
     credentials = store.get()
     if not credentials:
@@ -56,6 +59,7 @@ def _get_credentials():
     return credentials
 
 def _request_data(tz_aware_when, calendar, timezone):
+    logging.debug('_request_data:start')
     if MOCK_GOOGLE_CALENDAR_DATA:
         with open(local_file(MOCK_GOOGLE_CALENDAR_DATA_FILE)) as mock_data:
             eventsResult = json.load(mock_data)[calendar['id']]
@@ -67,7 +71,9 @@ def _request_data(tz_aware_when, calendar, timezone):
         # So we'll just ask for everything today, and filter it locally.  Not great, but I'm not seeing a better solution
         start_of_day = tz_aware_when.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(pytz.utc).isoformat()
         end_of_day = tz_aware_when.replace(hour=23, minute=59, second=59, microsecond=999999).astimezone(pytz.utc).isoformat()
+        logging.debug('_request_data:request start')
         eventsResult = service.events().list(calendarId=calendar['id'], timeMin=start_of_day, timeMax=end_of_day, singleEvents=True, orderBy='startTime', timeZone=tz_aware_when.tzinfo.zone).execute()
+        logging.debug('_request_data:request end')
 
     eventsResult['items'] = eventsResult.get('items', [])
     for event in eventsResult['items']:
@@ -75,6 +81,7 @@ def _request_data(tz_aware_when, calendar, timezone):
         event['parsed_end'] = dateutil.parser.parse(event['end']['dateTime']) if 'dateTime' in event['end'] else timezone.localize(dateutil.parser.parse(event['end']['date']))
         event['all_day'] = 'date' in event['start']
     eventsResult['items'] = [e for e in eventsResult['items'] if e['all_day'] or e['parsed_end'] > tz_aware_when]
+    logging.debug('_request_data:end')
     return eventsResult['items']
 
 def _calendar_data(tz_aware_when, calendar, timezone):
@@ -91,6 +98,7 @@ def _calendar_data(tz_aware_when, calendar, timezone):
     return cleaned_events
 
 def _fetch_events_for_day(day, calendars, timezone):
+    logging.debug('_fetch_events_for_day')
     events = []
     for calendar in calendars:
         events.extend(_calendar_data(day, calendar, timezone))
@@ -98,6 +106,7 @@ def _fetch_events_for_day(day, calendars, timezone):
     return events
 
 def fetch(tz_aware_when):
+    logging.debug('fetch')
     plus_one = tz_aware_when.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
     plus_two = plus_one + datetime.timedelta(days=1)
     plus_three = plus_two + datetime.timedelta(days=1)
@@ -110,6 +119,7 @@ def fetch(tz_aware_when):
 
 def generate_credentials():
     '''Requires web browser available to handle authorization flow'''
+    logging.debug('generate_credentials')
     store = _get_credentials_store()
     credentials = store.get()
     if not credentials or credentials.invalid:
@@ -119,6 +129,7 @@ def generate_credentials():
     return credentials
 
 def list_calendars():
+    logging.debug('list_calendars')
     credentials = _get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
