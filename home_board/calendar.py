@@ -71,7 +71,7 @@ def _get_credentials():
         credentials = generate_credentials()
     return credentials
 
-def _request_data(tz_aware_when, calendar, timezone):
+def _request_data(tz_aware_when_start, tz_aware_when_end, calendar, timezone):
     logging.debug('_request_data:start')
     if MOCK_GOOGLE_CALENDAR_DATA:
         with open(local_file(MOCK_GOOGLE_CALENDAR_DATA_FILE)) as mock_data:
@@ -82,12 +82,10 @@ def _request_data(tz_aware_when, calendar, timezone):
         logging.debug('_request_data:discovery start')
         service = discovery.build('calendar', 'v3', http=http, cache=MemoryCache())
         logging.debug('_request_data:discovery end')
-        # Issues with all-day events not being returned by Google after the UTC date rolls over to tomorrow, even though the local time is still today
-        # So we'll just ask for everything today, and filter it locally.  Not great, but I'm not seeing a better solution
-        start_of_day = tz_aware_when.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(pytz.utc).isoformat()
-        end_of_day = tz_aware_when.replace(hour=23, minute=59, second=59, microsecond=999999).astimezone(pytz.utc).isoformat()
+        start = tz_aware_when_start.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(pytz.utc).isoformat()
+        end = tz_aware_when_end.replace(hour=23, minute=59, second=59, microsecond=999999).astimezone(pytz.utc).isoformat()
         logging.debug('_request_data:request start')
-        eventsResult = service.events().list(calendarId=calendar['id'], timeMin=start_of_day, timeMax=end_of_day, singleEvents=True, orderBy='startTime', timeZone=tz_aware_when.tzinfo.zone).execute()
+        eventsResult = service.events().list(calendarId=calendar['id'], timeMin=start, timeMax=end, singleEvents=True, orderBy='startTime', timeZone=timezone).execute()
         logging.debug('_request_data:request end')
 
     eventsResult['items'] = eventsResult.get('items', [])
@@ -95,12 +93,11 @@ def _request_data(tz_aware_when, calendar, timezone):
         event['parsed_start'] = dateutil.parser.parse(event['start']['dateTime']) if 'dateTime' in event['start'] else timezone.localize(dateutil.parser.parse(event['start']['date']))
         event['parsed_end'] = dateutil.parser.parse(event['end']['dateTime']) if 'dateTime' in event['end'] else timezone.localize(dateutil.parser.parse(event['end']['date']))
         event['all_day'] = 'date' in event['start']
-    eventsResult['items'] = [e for e in eventsResult['items'] if e['all_day'] or e['parsed_end'] > tz_aware_when]
     logging.debug('_request_data:end')
     return eventsResult['items']
 
-def _calendar_data(tz_aware_when, calendar, timezone):
-    events = _request_data(tz_aware_when, calendar, timezone)
+def _calendar_data(tz_aware_when_start, tz_aware_when_end, calendar, timezone):
+    events = _request_data(tz_aware_when_start, tz_aware_when_end, calendar, timezone)
     cleaned_events = []
     for event in events:
         cleaned_events.append({
@@ -112,25 +109,44 @@ def _calendar_data(tz_aware_when, calendar, timezone):
         })
     return cleaned_events
 
-def _fetch_events_for_day(day, calendars, timezone):
-    logging.debug('_fetch_events_for_day')
+def _fetch_events(first_day, last_day, calendars, timezone):
+    logging.debug('_fetch_events')
     events = []
     for calendar in calendars:
-        events.extend(_calendar_data(day, calendar, timezone))
+        events.extend(_calendar_data(first_day, last_day, calendar, timezone))
     events.sort(key=lambda e: e['start'])
     return events
 
 def fetch(tz_aware_when):
     logging.debug('fetch')
-    plus_one = tz_aware_when.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
+    today = tz_aware_when.replace(hour=0, minute=0, second=0, microsecond=0)
+    plus_one = today + datetime.timedelta(days=1)
     plus_two = plus_one + datetime.timedelta(days=1)
     plus_three = plus_two + datetime.timedelta(days=1)
-    return {
-        'today': _fetch_events_for_day(tz_aware_when, CALENDARS, tz_aware_when.tzinfo),
-        'plus_one': _fetch_events_for_day(plus_one, CALENDARS, tz_aware_when.tzinfo),
-        'plus_two': _fetch_events_for_day(plus_two, CALENDARS, tz_aware_when.tzinfo),
-        'plus_three': _fetch_events_for_day(plus_three, CALENDARS, tz_aware_when.tzinfo)
-    }
+
+    retVal = {'today': [], 'plus_one': [], 'plus_two': [], 'plus_three': []}
+    fetched_events = _fetch_events(today, plus_three, CALENDARS, tz_aware_when.tzinfo)
+    for event in fetched_events:
+        if event['end'] < tz_aware_when: continue # Skip events that are already over
+
+        if ((event['start'] >= today and event['start'] < plus_one) or # Starts today
+            (event['end'] >= today and event['end'] < plus_one) or # Ends today
+            (event['start'] < today and event['end'] > today)): # Starts before today and ends after today
+            retVal['today'].append(event)
+
+        if ((event['start'] >= plus_one and event['start'] < plus_two) or # Starts on day 1
+            (event['end'] >= plus_one and event['end'] < plus_two) or # Ends on Day 1
+            (event['start'] < plus_one and event['end'] > plus_one)): # Starts before Day 1 and ends after Day 1
+            retVal['plus_one'].append(event)
+
+        if ((event['start'] >= plus_two and event['start'] < plus_three) or # Starts on day 2
+            (event['end'] >= plus_two and event['end'] < plus_three) or # Ends on Day 2
+            (event['start'] < plus_two and event['end'] > plus_two)): # Starts before Day 2 and ends after Day 2
+            retVal['plus_two'].append(event)
+
+        if event['start'] >= plus_three or event['end'] > plus_three: retVal['plus_three'].append(event)
+
+    return retVal
 
 def generate_credentials():
     '''Requires web browser available to handle authorization flow'''
