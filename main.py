@@ -17,6 +17,8 @@ MOCK_WEATHER_FILE = 'mock_data/mock_weather_data.pickle'
 MOCK_SPECIAL_EVENTS_FILE = 'mock_data/mock_special_events_data.pickle'
 CACHE_FILE = '/ram-tmp/home_board.cache'
 
+logging.basicConfig(level=logging.DEBUG)
+
 def deep_defaults(target, source):
     """
     https://gist.github.com/angstwad/bf22d1822c38a92ec0a9
@@ -37,6 +39,7 @@ def _dst_start_end(tz_aware_when):
     return dst_start_local, dst_end_local
 
 def fetch_calendar(context, days):
+    logging.debug('fetch_calendar:start')
     try:
         if MOCK_CALENDAR:
             with open(util.local_file(MOCK_CALENDAR_FILE), 'rb') as mock_data:
@@ -54,8 +57,10 @@ def fetch_calendar(context, days):
         context['success']['calendar'] = True
     except Exception as ex:
         logging.exception('Exception while fetching Calendar')
+    logging.debug('fetch_calendar:end')
 
 def fetch_weather(context, days):
+    logging.debug('fetch_weather:start')
     try:
         if MOCK_WEATHER:
             with open(util.local_file(MOCK_WEATHER_FILE), 'rb') as mock_data:
@@ -75,8 +80,10 @@ def fetch_weather(context, days):
         context['success']['weather'] = True
     except Exception as ex:
         logging.exception('Exception while fetching Weather')
+    logging.debug('fetch_weather:end')
 
 def fetch_special_events(context, days):
+    logging.debug('fetch_special_events:start')
     try:
         if MOCK_SPECIAL_EVENTS:
             with open(util.local_file(MOCK_SPECIAL_EVENTS_FILE), 'rb') as mock_data:
@@ -98,8 +105,10 @@ def fetch_special_events(context, days):
         context['success']['special-events'] = True
     except Exception as ex:
         logging.exception('Exception while fetching Special Events')
+    logging.debug('fetch_special_events:end')
 
 def fetch_daylight_saving_time(context, days):
+    logging.debug('fetch_daylight_saving_time:start')
     try:
         dst_start_local, dst_end_local = _dst_start_end(context['now'])
         dst_start_local = dst_start_local.date()
@@ -115,6 +124,7 @@ def fetch_daylight_saving_time(context, days):
         context['success']['dst'] = True
     except Exception as ex:
         logging.exception('Exception while processing Daylight Saving Time')
+    logging.debug('fetch_daylight_saving_time:end')
 
 def fetch_data():
     days = ['today', 'plus_one', 'plus_two', 'plus_three']

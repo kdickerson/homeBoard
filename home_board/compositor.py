@@ -1,6 +1,7 @@
 # Generate in image from the provided weather, calendar, special_events data
 from PIL import Image, ImageDraw, ImageFont
 from .util import local_file
+import logging
 import os
 
 EPD_WIDTH = 640
@@ -72,6 +73,7 @@ def _draw_header(draw, offset, text, font, color=BLACK):
     _draw_centered_text(draw, offset, COLUMN_WIDTH, text, font, color)
 
 def _draw_calendar(image, draw, events, offset, bottom, cal_header_font, description_font):
+    logging.debug('_draw_calendar:start')
     time_left_margin = 5
     text_left_margin = 5
     right_margin = 5
@@ -101,8 +103,10 @@ def _draw_calendar(image, draw, events, offset, bottom, cal_header_font, descrip
         draw.text((offset[0] + time_left_margin, top), header, font=cal_header_font, fill=RED if event['underway'] else BLACK)
         draw.text((offset[0] + text_left_margin, top + header_dim[1]), desc, font=description_font, fill=RED if event['underway'] else BLACK)
         top = top + header_dim[1] + desc_dim[1] + bottom_margin
+    logging.debug('_draw_calendar:end')
 
 def _draw_forecast_and_current(image, draw, conditions, forecast, header_font, temp_font):
+    logging.debug('_draw_forecast_and_current:start')
     SUB_COLUMN_WIDTH = COLUMN_WIDTH // 2
 
     # Sub column 1:
@@ -118,8 +122,10 @@ def _draw_forecast_and_current(image, draw, conditions, forecast, header_font, t
         image.paste(forecast_icon, ((SUB_COLUMN_WIDTH - cur_icon.size[0]) // 2 + SUB_COLUMN_WIDTH, WEATHER_ICON_TOP))
     except:
         _draw_centered_text(draw, (0, WEATHER_ICON_TOP), COLUMN_WIDTH, conditions['description'], temp_font)
+    logging.debug('_draw_forecast_and_current:end')
 
 def _draw_forecast(image, draw, column_left, forecast, header_font, temp_font):
+    logging.debug('_draw_forecast:start')
     msg = str(forecast['low-temperature']) + '–' + str(forecast['high-temperature']) # Center before adding the °
     _draw_centered_text(draw, (column_left, WEATHER_TEMP_TOP), COLUMN_WIDTH, msg + '°', temp_font, measure_text=msg)
     try:
@@ -127,8 +133,10 @@ def _draw_forecast(image, draw, column_left, forecast, header_font, temp_font):
         image.paste(icon, ((COLUMN_WIDTH - icon.size[0]) // 2 + column_left, WEATHER_ICON_TOP))
     except:
         _draw_centered_text(draw, (column_left, WEATHER_ICON_TOP), COLUMN_WIDTH, forecast['description'], temp_font)
+    logging.debug('_draw_forecast:end')
 
 def _draw_special_event(image, draw, event, footer_offset, font):
+    logging.debug('_draw_special_event:start')
     textsize = draw.textsize(event['msg'], font=font)
     iconsize = (0, 0)
     icon = None
@@ -156,15 +164,19 @@ def _draw_special_event(image, draw, event, footer_offset, font):
         text_offset = (text_offset[0], text_offset[1] + text_to_footer_gap)
     image.paste(icon, icon_offset) if icon else None
     draw.text(text_offset, event['msg'], font=font, fill=RED)
+    logging.debug('_draw_special_event:end')
     return (min(icon_offset[0], text_offset[0]), min(icon_offset[1], text_offset[1])), msgsize
 
 def _draw_footer(image, draw, text, font):
+    logging.debug('_draw_footer:start')
     dimensions = draw.textsize(text, font=font)
     offset = (EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1])
     draw.text(offset, text, font=font, fill=BLACK)
+    logging.debug('_draw_footer:end')
     return offset, dimensions
 
 def create(context):
+    logging.debug('create:start')
     image = Image.new('L', (EPD_WIDTH, EPD_HEIGHT), WHITE)
     draw = ImageDraw.Draw(image)
     draw.fontmode = '1' # No Anti-aliasing
@@ -217,4 +229,6 @@ def create(context):
     if context['plus_three']['forecast']: _draw_forecast(image, draw, left, context['plus_three']['forecast'], fonts['header'], fonts['temperature'])
     if context['plus_three']['events']: _draw_calendar(image, draw, context['plus_three']['events'], (left, CALENDAR_TOP), cal_bottom, fonts['calendar_header'], fonts['calendar_body'])
 
+    logging.debug('create:end')
     return image
+
