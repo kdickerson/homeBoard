@@ -9,6 +9,7 @@ import pytz
 from .util import local_file
 
 from apiclient import discovery
+from googleapiclient.discovery_cache.base import Cache
 from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
