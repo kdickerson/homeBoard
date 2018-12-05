@@ -21,6 +21,17 @@ APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 MOCK_GOOGLE_CALENDAR_DATA = False
 MOCK_GOOGLE_CALENDAR_DATA_FILE = 'mock_data/mock_google_calendar_data.json'
 
+# For Google's Discovery service, which is suddenly really slow and I need to stop hitting it for every calendar request
+class MemoryCache(Cache):
+    _CACHE = {}
+
+    def get(self, url):
+        return MemoryCache._CACHE.get(url)
+
+    def set(self, url, content):
+        MemoryCache._CACHE[url] = content
+
+
 # See list_calendars() to get a list of available IDs
 CALENDARS = [
     {'id': 'kyle.dickerson@gmail.com', 'label': 'Kyle'},
@@ -66,7 +77,9 @@ def _request_data(tz_aware_when, calendar, timezone):
     else:
         credentials = _get_credentials()
         http = credentials.authorize(httplib2.Http(timeout=60))
-        service = discovery.build('calendar', 'v3', http=http, cache_discovery=False)
+        logging.debug('_request_data:discovery start')
+        service = discovery.build('calendar', 'v3', http=http, cache=MemoryCache())
+        logging.debug('_request_data:discovery end')
         # Issues with all-day events not being returned by Google after the UTC date rolls over to tomorrow, even though the local time is still today
         # So we'll just ask for everything today, and filter it locally.  Not great, but I'm not seeing a better solution
         start_of_day = tz_aware_when.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(pytz.utc).isoformat()
