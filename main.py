@@ -17,7 +17,7 @@ MOCK_WEATHER_FILE = 'mock_data/mock_weather_data.pickle'
 MOCK_SPECIAL_EVENTS_FILE = 'mock_data/mock_special_events_data.pickle'
 CACHE_FILE = '/ram-tmp/home_board.cache'
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.WARNING)
 
 def deep_defaults(target, source):
     """
