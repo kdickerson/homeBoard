@@ -21,6 +21,7 @@ CREDENTIALS_FILE = 'private/google_calendar_credentials.key'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 MOCK_GOOGLE_CALENDAR_DATA = False
 MOCK_GOOGLE_CALENDAR_DATA_FILE = 'mock_data/mock_google_calendar_data.json'
+HTTPLIB2_CACHE_DIR = '/ram-tmp/httplib2_cache'
 
 # For Google's Discovery service, which is suddenly really slow and I need to stop hitting it for every calendar request
 class MemoryCache(Cache):
@@ -77,7 +78,7 @@ def _request_data(tz_aware_when, calendar, timezone):
             eventsResult = json.load(mock_data)[calendar['id']]
     else:
         credentials = _get_credentials()
-        http = credentials.authorize(httplib2.Http(timeout=60))
+        http = credentials.authorize(httplib2.Http(cache=HTTPLIB2_CACHE_DIR, timeout=60))
         logging.debug('_request_data:discovery start')
         service = discovery.build('calendar', 'v3', http=http, cache=MemoryCache())
         logging.debug('_request_data:discovery end')
