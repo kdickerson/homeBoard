@@ -117,36 +117,96 @@ def _fetch_events(first_day, last_day, calendars, timezone):
     events.sort(key=lambda e: e['start'])
     return events
 
+def _segment_events(tz_aware_when, today, plus_one, plus_two, plus_three, events):
+    """
+    >>> tz = pytz.timezone("America/Los_Angeles")
+    >>> tz_aware_when = dateutil.parser.parse("2018-12-01T18:32:45-08:00")
+    >>> today = tz_aware_when.replace(hour=0, minute=0, second=0, microsecond=0)
+    >>> plus_one = today + datetime.timedelta(days=1)
+    >>> plus_two = plus_one + datetime.timedelta(days=1)
+    >>> plus_three = plus_two + datetime.timedelta(days=1)
+    >>> events = [
+    ...     {
+    ...         'start': tz.localize(dateutil.parser.parse('2018-11-30')),
+    ...         'end': tz.localize(dateutil.parser.parse('2018-12-04')),
+    ...         'description': 'Multi-day',
+    ...         'all_day': True,
+    ...     },
+    ...     {
+    ...         'start': dateutil.parser.parse('2018-12-01T18:15:00-08:00'),
+    ...         'end': dateutil.parser.parse('2018-12-01T19:00:00-08:00'),
+    ...         'description': 'Happening Now',
+    ...         'all_day': False,
+    ...     },
+    ...     {
+    ...         'start': dateutil.parser.parse('2018-12-01T20:00:00-08:00'),
+    ...         'end': dateutil.parser.parse('2018-12-01T20:30:00-08:00'),
+    ...         'description': 'Future still Today',
+    ...         'all_day': False,
+    ...     },
+    ...     {
+    ...         'start': dateutil.parser.parse('2018-12-02T08:00:00-08:00'),
+    ...         'end': dateutil.parser.parse('2018-12-02T09:00:00-08:00'),
+    ...         'description': 'Tomorrow',
+    ...         'all_day': False,
+    ...     },
+    ...     {
+    ...         'start': tz.localize(dateutil.parser.parse('2018-12-03')),
+    ...         'end': tz.localize(dateutil.parser.parse('2018-12-06')),
+    ...         'description': 'Future past the end',
+    ...         'all_day': True,
+    ...     },
+    ...     {
+    ...         'start': dateutil.parser.parse('2018-12-01T08:00:00-08:00'),
+    ...         'end': dateutil.parser.parse('2018-12-01T11:00:00-08:00'),
+    ...         'description': 'Already Over',
+    ...         'all_day': False,
+    ...     },
+    ... ]
+    >>> segmented_events = _segment_events(tz_aware_when, today, plus_one, plus_two, plus_three, events)
+    >>> len(segmented_events['today'])
+    3
+    >>> segmented_events['today'][0]['description']
+    'Multi-day'
+    >>> segmented_events['today'][1]['description']
+    'Happening Now'
+    >>> segmented_events['today'][2]['description']
+    'Future still Today'
+    >>> len(segmented_events['plus_one'])
+    2
+    >>> segmented_events['plus_one'][0]['description']
+    'Multi-day'
+    >>> segmented_events['plus_one'][1]['description']
+    'Tomorrow'
+    >>> len(segmented_events['plus_two'])
+    2
+    >>> segmented_events['plus_two'][0]['description']
+    'Multi-day'
+    >>> segmented_events['plus_two'][1]['description']
+    'Future past the end'
+    >>> len(segmented_events['plus_three'])
+    1
+    >>> segmented_events['plus_three'][0]['description']
+    'Future past the end'
+    >>>
+    """
+    retVal = {'today': [], 'plus_one': [], 'plus_two': [], 'plus_three': []}
+    for event in events:
+        if event['end'] < tz_aware_when: continue # Skip events that are already over
+        if event['start'] < plus_one and event['end'] > today: retVal['today'].append(event)
+        if event['start'] < plus_two and event['end'] > plus_one: retVal['plus_one'].append(event)
+        if event['start'] < plus_three and event['end'] > plus_two: retVal['plus_two'].append(event)
+        if event['end'] > plus_three: retVal['plus_three'].append(event)
+    return retVal
+
 def fetch(tz_aware_when):
     logging.debug('fetch')
     today = tz_aware_when.replace(hour=0, minute=0, second=0, microsecond=0)
     plus_one = today + datetime.timedelta(days=1)
     plus_two = plus_one + datetime.timedelta(days=1)
     plus_three = plus_two + datetime.timedelta(days=1)
-
-    retVal = {'today': [], 'plus_one': [], 'plus_two': [], 'plus_three': []}
     fetched_events = _fetch_events(today, plus_three, CALENDARS, tz_aware_when.tzinfo)
-    for event in fetched_events:
-        if event['end'] < tz_aware_when: continue # Skip events that are already over
-
-        if ((event['start'] >= today and event['start'] < plus_one) or # Starts today
-            (event['end'] >= today and event['end'] < plus_one) or # Ends today
-            (event['start'] < today and event['end'] > today)): # Starts before today and ends after today
-            retVal['today'].append(event)
-
-        if ((event['start'] >= plus_one and event['start'] < plus_two) or # Starts on day 1
-            (event['end'] >= plus_one and event['end'] < plus_two) or # Ends on Day 1
-            (event['start'] < plus_one and event['end'] > plus_one)): # Starts before Day 1 and ends after Day 1
-            retVal['plus_one'].append(event)
-
-        if ((event['start'] >= plus_two and event['start'] < plus_three) or # Starts on day 2
-            (event['end'] >= plus_two and event['end'] < plus_three) or # Ends on Day 2
-            (event['start'] < plus_two and event['end'] > plus_two)): # Starts before Day 2 and ends after Day 2
-            retVal['plus_two'].append(event)
-
-        if event['start'] >= plus_three or event['end'] > plus_three: retVal['plus_three'].append(event)
-
-    return retVal
+    return _segment_events(tz_aware_when, today, plus_one, plus_two, plus_three, fetched_events)
 
 def generate_credentials():
     '''Requires web browser available to handle authorization flow'''
@@ -173,3 +233,4 @@ def list_calendars():
             'description': item.get('description', ''),
         })
     return cleaned_calendars
+

@@ -39,6 +39,10 @@ Special Event messages are displayed in red.
 
 Original icons from flaticons.net and then modified.
 
+Run DocTests:
+
+    > pipenv run python doctest_runner.py -v
+
 Example Crontab entries:
 
     > # Update every 15 minutes during the day
