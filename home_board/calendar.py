@@ -21,7 +21,8 @@ CREDENTIALS_FILE = 'private/google_calendar_credentials.key'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 MOCK_GOOGLE_CALENDAR_DATA = False
 MOCK_GOOGLE_CALENDAR_DATA_FILE = 'mock_data/mock_google_calendar_data.json'
-HTTPLIB2_CACHE_DIR = '/ram-tmp/httplib2_cache'
+# TODO: URLs seem to be changing which negates the cache, but fills it up.  Need to figure that out and implement a cleanup strategy so old entries get culled
+HTTPLIB2_CACHE_DIR = None #'/ram-tmp/httplib2_cache'
 
 # For Google's Discovery service, which is suddenly really slow and I need to stop hitting it for every calendar request
 class MemoryCache(Cache):
