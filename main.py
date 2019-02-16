@@ -7,7 +7,8 @@ import sys
 
 import pytz
 
-from home_board import calendar, compositor, special_events, util, weather
+from home_board import calendar, compositor, special_events, util
+from home_board import wunderground as weather
 
 TIME_ZONE = "America/Los_Angeles"
 SAVE_MOCK = False
