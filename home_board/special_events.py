@@ -17,24 +17,62 @@ import datetime
 '''
 
 EVENTS = [
-    {'month': 3, 'day': 17, 'header': 'Birthday', 'title': 'Corinne', 'msg': 'Happy Birthday, Corinne!', 'icon': 'birthday'},
-    {'month': 6, 'day': 9, 'header': 'Birthday', 'title': 'Kyle', 'msg': 'Happy Birthday, Kyle!', 'icon': 'birthday'},
-    {'month': 6, 'day': 23, 'header': 'Anniversary', 'title': 'Kyle & Jess', 'msg': 'Happy Anniversary!', 'icon': 'birthday'},
-    {'month': 9, 'day': 20, 'header': 'Birthday', 'title': 'Jess', 'msg': 'Happy Birthday, Jess!', 'icon': 'birthday'},
-    {'month': 10, 'day': 28, 'header': 'Birthday', 'title': 'Heather', 'msg': 'Happy Birthday, Heather!', 'icon': 'birthday'},
+    # Events with same day every year:
+    {'month': 2, 'day': 14, 'msg': 'Happy Valentine\'s Day!', 'icon': 'heart'},
+    {'month': 7, 'day': 4, 'msg': 'Happy Independence Day!', 'icon': 'flag'},
     {'month': 10, 'day': 31, 'msg': 'Happy Halloween!', 'icon': 'halloween'},
     {'month': 12, 'day': 25, 'msg': 'Merry Christmas!', 'icon': 'christmas'},
-    {'year': 2018, 'month': 11, 'day': 22, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
-    # Seasons 2018:
-    {'year': 2018, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
-    {'year': 2018, 'month': 6, 'day': 21, 'header': 'Season', 'title': 'Summer'},
-    {'year': 2018, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
-    {'year': 2018, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+    # Thanksgiving Dates:
+    {'year': 2019, 'month': 11, 'day': 28, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
+    {'year': 2020, 'month': 11, 'day': 26, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
+    {'year': 2021, 'month': 11, 'day': 25, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
+    {'year': 2022, 'month': 11, 'day': 24, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
+    {'year': 2023, 'month': 11, 'day': 23, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
+    {'year': 2024, 'month': 11, 'day': 28, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
+    {'year': 2025, 'month': 11, 'day': 27, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
     # Seasons 2019:
-    {'year': 2019, 'month': 3, 'day': 21, 'header': 'Season', 'title': 'Spring'},
+    {'year': 2019, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
     {'year': 2019, 'month': 6, 'day': 21, 'header': 'Season', 'title': 'Summer'},
     {'year': 2019, 'month': 9, 'day': 23, 'header': 'Season', 'title': 'Fall'},
-    {'year': 2019, 'month': 12, 'day': 22, 'header': 'Season', 'title': 'Winter'},
+    {'year': 2019, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+    # Seasons 2020:
+    {'year': 2020, 'month': 3, 'day': 19, 'header': 'Season', 'title': 'Spring'},
+    {'year': 2020, 'month': 6, 'day': 21, 'header': 'Season', 'title': 'Summer'},
+    {'year': 2020, 'month': 9, 'day': 23, 'header': 'Season', 'title': 'Fall'},
+    {'year': 2020, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+    # Seasons 2021:
+    {'year': 2021, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
+    {'year': 2021, 'month': 6, 'day': 20, 'header': 'Season', 'title': 'Summer'},
+    {'year': 2021, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
+    {'year': 2021, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+    # Seasons 2022:
+    {'year': 2022, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
+    {'year': 2022, 'month': 6, 'day': 21, 'header': 'Season', 'title': 'Summer'},
+    {'year': 2022, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
+    {'year': 2022, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+    # Seasons 2023:
+    {'year': 2023, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
+    {'year': 2023, 'month': 6, 'day': 21, 'header': 'Season', 'title': 'Summer'},
+    {'year': 2023, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
+    {'year': 2023, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+    # Seasons 2024:
+    {'year': 2024, 'month': 3, 'day': 19, 'header': 'Season', 'title': 'Spring'},
+    {'year': 2024, 'month': 6, 'day': 20, 'header': 'Season', 'title': 'Summer'},
+    {'year': 2024, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
+    {'year': 2024, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+    # Seasons 2025:
+    {'year': 2025, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
+    {'year': 2025, 'month': 6, 'day': 20, 'header': 'Season', 'title': 'Summer'},
+    {'year': 2025, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
+    {'year': 2025, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+
+    # Family Events
+    {'month': 3, 'day': 17, 'header': 'Birthday', 'title': 'Corinne', 'msg': 'Happy Birthday, Corinne!', 'icon': 'birthday'},
+    {'month': 6, 'day': 9, 'header': 'Birthday', 'title': 'Kyle', 'msg': 'Happy Birthday, Kyle!', 'icon': 'birthday'},
+    {'month': 9, 'day': 20, 'header': 'Birthday', 'title': 'Jess', 'msg': 'Happy Birthday, Jess!', 'icon': 'birthday'},
+    {'month': 10, 'day': 28, 'header': 'Birthday', 'title': 'Heather', 'msg': 'Happy Birthday, Heather!', 'icon': 'birthday'},
+    {'month': 6, 'day': 23, 'header': 'Anniversary', 'title': 'Kyle & Jess', 'msg': 'Happy Anniversary!', 'icon': 'birthday'},
+
 ]
 
 def _find_event_for_day(day):
