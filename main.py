@@ -1,11 +1,13 @@
-from home_board import weather, calendar, special_events, compositor, util
-import datetime
 import collections
+import datetime
 import logging
 import os
 import pickle
-import pytz
 import sys
+
+import pytz
+
+from home_board import calendar, compositor, special_events, util, weather
 
 TIME_ZONE = "America/Los_Angeles"
 SAVE_MOCK = False
@@ -15,9 +17,10 @@ MOCK_SPECIAL_EVENTS = False
 MOCK_CALENDAR_FILE = 'mock_data/mock_calendar_data.pickle'
 MOCK_WEATHER_FILE = 'mock_data/mock_weather_data.pickle'
 MOCK_SPECIAL_EVENTS_FILE = 'mock_data/mock_special_events_data.pickle'
-CACHE_FILE = None #'/ram-tmp/home_board.cache'
+CACHE_FILE = None  # '/ram-tmp/home_board.cache'
 
 logging.basicConfig(level=logging.DEBUG)
+
 
 def deep_defaults(target, source):
     """
@@ -30,13 +33,15 @@ def deep_defaults(target, source):
         elif k not in target or target[k] is None:
             target[k] = source[k]
 
+
 def _dst_start_end(tz_aware_when):
-    dst_start_utc, dst_end_utc = [dt for dt in tz_aware_when.tzinfo._utc_transition_times if dt.year == tz_aware_when.year]
-    dst_start_tran_info = tz_aware_when.tzinfo._transition_info[tz_aware_when.tzinfo._utc_transition_times.index(dst_start_utc)]
-    dst_end_tran_info = tz_aware_when.tzinfo._transition_info[tz_aware_when.tzinfo._utc_transition_times.index(dst_end_utc)]
+    dst_start_utc, dst_end_utc = [dt for dt in tz_aware_when.tzinfo._utc_transition_times if dt.year == tz_aware_when.year]  # noqa: E501
+    dst_start_tran_info = tz_aware_when.tzinfo._transition_info[tz_aware_when.tzinfo._utc_transition_times.index(dst_start_utc)]  # noqa: E501
+    dst_end_tran_info = tz_aware_when.tzinfo._transition_info[tz_aware_when.tzinfo._utc_transition_times.index(dst_end_utc)]  # noqa: E501
     dst_start_local = tz_aware_when.tzinfo.localize(dst_start_utc + dst_start_tran_info[0])
     dst_end_local = tz_aware_when.tzinfo.localize(dst_end_utc + dst_end_tran_info[0])
     return dst_start_local, dst_end_local
+
 
 def fetch_calendar(context, days):
     logging.debug('fetch_calendar:start')
@@ -55,9 +60,10 @@ def fetch_calendar(context, days):
                 event['underway'] = event['start'] < context['now'] and context['now'] < event['end']
                 event['ending_days_away'] = (event['end'].date() - context[day]['date']).days
         context['success']['calendar'] = True
-    except Exception as ex:
+    except Exception:
         logging.exception('Exception while fetching Calendar')
     logging.debug('fetch_calendar:end')
+
 
 def fetch_weather(context, days):
     logging.debug('fetch_weather:start')
@@ -66,21 +72,25 @@ def fetch_weather(context, days):
             with open(util.local_file(MOCK_WEATHER_FILE), 'rb') as mock_data:
                 conditions = pickle.load(mock_data)
         else:
-            conditions = weather.fetch() # weather can only fetch conditions and forecast for "now"
+            conditions = weather.fetch()  # weather can only fetch conditions and forecast for "now"
             if SAVE_MOCK:
                 with open(util.local_file(MOCK_WEATHER_FILE), 'wb') as mock_data:
                     pickle.dump(conditions, mock_data)
             # Test date of forecast and throw away if not correct
-            forecast_date = datetime.datetime.fromtimestamp(conditions['forecast']['today']['epoch'], context['now'].tzinfo)
+            forecast_date = datetime.datetime.fromtimestamp(
+                conditions['forecast']['today']['epoch'], context['now'].tzinfo
+            )
             if forecast_date.date() != context['now'].date():
-                raise ValueError("Weather forecast date is not accurate. Received " + forecast_date.date().strftime('%Y-%m-%d'))
+                raise ValueError("Weather forecast date is not accurate. Received " +
+                                 forecast_date.date().strftime('%Y-%m-%d'))
         context['today']['conditions'] = conditions['current']
         for day in days:
             context[day]['forecast'] = conditions['forecast'][day]
         context['success']['weather'] = True
-    except Exception as ex:
+    except Exception:
         logging.exception('Exception while fetching Weather')
     logging.debug('fetch_weather:end')
+
 
 def fetch_special_events(context, days):
     logging.debug('fetch_special_events:start')
@@ -95,7 +105,11 @@ def fetch_special_events(context, days):
                     pickle.dump(special_event, mock_data)
         for day in days:
             context[day]['special_event'] = special_event[day]
-            if special_event[day] and 'title' in special_event[day] and (day != 'today' or 'msg' not in special_event[day]):
+            if (
+                special_event[day] and
+                'title' in special_event[day] and
+                (day != 'today' or 'msg' not in special_event[day])
+            ):
                 context[day]['events'].insert(0, {
                     'calendar_label': special_event[day]['header'] if special_event[day]['header'] else '',
                     'all_day': True,
@@ -103,9 +117,10 @@ def fetch_special_events(context, days):
                     'underway': day == 'today',
                 })
         context['success']['special-events'] = True
-    except Exception as ex:
+    except Exception:
         logging.exception('Exception while fetching Special Events')
     logging.debug('fetch_special_events:end')
+
 
 def fetch_daylight_saving_time(context, days):
     logging.debug('fetch_daylight_saving_time:start')
@@ -122,9 +137,10 @@ def fetch_daylight_saving_time(context, days):
                     'underway': day == 'today',
                 })
         context['success']['dst'] = True
-    except Exception as ex:
+    except Exception:
         logging.exception('Exception while processing Daylight Saving Time')
     logging.debug('fetch_daylight_saving_time:end')
+
 
 def fetch_data():
     days = ['today', 'plus_one', 'plus_two', 'plus_three']
@@ -140,31 +156,38 @@ def fetch_data():
     fetch_weather(context, days)
     fetch_calendar(context, days)
     fetch_special_events(context, days)
-    #fetch_daylight_saving_time(context, days)
+    # fetch_daylight_saving_time(context, days)
     context['success']['dst'] = True
 
     # Use cache to fill in any missing info
-    if CACHE_FILE and not all (context['success'].values()):
+    if CACHE_FILE and not all(context['success'].values()):
         try:
             with open(CACHE_FILE, 'rb') as cache_file:
                 cache = pickle.load(cache_file)
                 deep_defaults(context, cache)
-        except:
-            logging.exception('Exception loading data from cache_file: ' + str(CACHE_FILE) + '.  Needed data for:' + ','.join(sorted([k for k, v in context['success'].items() if not v])))
+        except:  # noqa: E722
+            logging.exception(
+                'Exception loading data from cache_file: ' +
+                str(CACHE_FILE) +
+                '.  Needed data for:' +
+                ','.join(sorted([k for k, v in context['success'].items() if not v]))
+            )
 
     # Update cache
     if CACHE_FILE:
         try:
             with open(CACHE_FILE, 'wb') as cache_file:
                 pickle.dump(context, cache_file)
-        except:
+        except:  # noqa: E722
             logging.exception('Exception writing data to cache_file: ' + str(CACHE_FILE))
 
     return context
 
+
 def make_image():
     context = fetch_data()
     return compositor.create(context)
+
 
 def display_image():
     from waveshare import epd7in5b
@@ -173,15 +196,17 @@ def display_image():
     image = make_image()
     epd.display_frame(epd.get_frame_buffer(image))
 
+
 def save_image():
     image = make_image()
     image.save('composite.bmp')
 
-'''
-    Save image rather than send to display (for quick testing of design changes):
-    python main.py save
-'''
+
 if __name__ == '__main__':
+    '''
+        Save image rather than send to display (for quick testing of design changes):
+        > python main.py save
+    '''
     util.set_base_path(os.path.dirname(os.path.abspath(__file__)))
 
     if len(sys.argv) > 1 and sys.argv[1] == 'save':

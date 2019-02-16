@@ -1,13 +1,15 @@
 # Fetch weather info from WUnderground and/or local station, process, and return
-from urllib.request import urlopen
 import json
 import logging
+from urllib.request import urlopen
+
 from .util import local_file
 
 CLIENT_SECRET_FILE = 'private/wunderground.key'
-PWS_ID = 'KCALIVER107' # Wunderground Personal Weather Station ID
+PWS_ID = 'KCALIVER107'  # Wunderground Personal Weather Station ID
 MOCK_WUNDERGROUND_DATA = False
 MOCK_WUNDERGROUND_DATA_FILE = 'mock_data/mock_wunderground_data.json'
+
 
 def _request_data(api_key, pws_id):
     logging.debug('_request_data:start')
@@ -15,12 +17,14 @@ def _request_data(api_key, pws_id):
         with open(local_file(MOCK_WUNDERGROUND_DATA_FILE)) as mock_data:
             json_string = mock_data.read()
     else:
-        query_url = 'http://api.wunderground.com/api/{api_key}/conditions/forecast/q/pws:{pws_id}.json'.format(api_key=api_key, pws_id=pws_id)
+        query_url = 'http://api.wunderground.com/api/{api_key}/conditions/forecast/q/pws:{pws_id}.json'
+        query_url = query_url.format(api_key=api_key, pws_id=pws_id)
         with urlopen(query_url, timeout=60) as response:
             json_string = response.read().decode('utf8')
     parsed_json = json.loads(json_string)
     logging.debug('_request_data:end')
     return parsed_json['current_observation'], parsed_json['forecast']['simpleforecast']['forecastday']
+
 
 def _extract_cleaned_forecast(day_idx, forecasts):
     return {
@@ -30,6 +34,7 @@ def _extract_cleaned_forecast(day_idx, forecasts):
         'icon': forecasts[day_idx]['icon'],
         'epoch': float(forecasts[day_idx]['date']['epoch']),
     }
+
 
 def _wunderground_data():
     logging.debug('_wunderground_data:start')
@@ -52,6 +57,7 @@ def _wunderground_data():
     }
     logging.debug('_wunderground_data:end')
     return cleaned_current, cleaned_forecast
+
 
 def fetch():
     current, forecast = _wunderground_data()

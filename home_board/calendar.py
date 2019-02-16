@@ -1,18 +1,17 @@
 # Fetch calendaring info from Google, process, and return
 import datetime
-import dateutil.parser
-import httplib2
 import json
 import logging
-import os
-import pytz
-from .util import local_file
 
+import dateutil.parser
+import httplib2
+import pytz
 from apiclient import discovery
 from googleapiclient.discovery_cache.base import Cache
-from oauth2client import client
-from oauth2client import tools
+from oauth2client import client, tools
 from oauth2client.file import Storage
+
+from .util import local_file
 
 # If modifying these scopes, delete your previously saved credentials
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
@@ -21,11 +20,16 @@ CREDENTIALS_FILE = 'private/google_calendar_credentials.key'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 MOCK_GOOGLE_CALENDAR_DATA = False
 MOCK_GOOGLE_CALENDAR_DATA_FILE = 'mock_data/mock_google_calendar_data.json'
-# TODO: URLs seem to be changing which negates the cache, but fills it up.  Need to figure that out and implement a cleanup strategy so old entries get culled
-HTTPLIB2_CACHE_DIR = None #'/ram-tmp/httplib2_cache'
+# TODO: URLs seem to be changing which negates the cache, but fills it up.
+#       Need to figure that out and implement a cleanup strategy so old entries get culled
+HTTPLIB2_CACHE_DIR = None  # '/ram-tmp/httplib2_cache'
 
-# For Google's Discovery service, which is suddenly really slow and I need to stop hitting it for every calendar request
+
 class MemoryCache(Cache):
+    '''
+        For Google's Discovery service, which is suddenly really slow and
+            I need to stop hitting it for every calendar request
+    '''
     _CACHE = {}
 
     def get(self, url):
@@ -47,10 +51,12 @@ CALENDARS = [
     {'id': 'en.usa#holiday@group.v.calendar.google.com', 'label': 'Holidays'}
 ]
 
+
 def _get_credentials_store():
     logging.debug('_get_credentials_store')
     credential_path = local_file(CREDENTIALS_FILE)
     return Storage(credential_path)
+
 
 def _get_credentials():
     """Gets valid user credentials from storage.
@@ -67,10 +73,14 @@ def _get_credentials():
     store = _get_credentials_store()
     credentials = store.get()
     if not credentials:
-        raise ValueError("No valid credentials found.  Run generate_credentials manually to generate them.  Must be done manually with available local web browser the first time only.")
+        msg = "No valid credentials found.  \
+            Run generate_credentials manually to generate them.  \
+            Must be done manually with available local web browser the first time only."
+        raise ValueError(msg)
     if credentials.invalid:
         credentials = generate_credentials()
     return credentials
+
 
 def _request_data(tz_aware_when_start, tz_aware_when_end, calendar, timezone):
     logging.debug('_request_data:start')
@@ -84,18 +94,32 @@ def _request_data(tz_aware_when_start, tz_aware_when_end, calendar, timezone):
         service = discovery.build('calendar', 'v3', http=http, cache=MemoryCache())
         logging.debug('_request_data:discovery end')
         start = tz_aware_when_start.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(pytz.utc).isoformat()
-        end = tz_aware_when_end.replace(hour=23, minute=59, second=59, microsecond=999999).astimezone(pytz.utc).isoformat()
+        end = tz_aware_when_end.replace(hour=23, minute=59, second=59, microsecond=999999).astimezone(pytz.utc).isoformat()  # noqa: E501
         logging.debug('_request_data:request start')
-        eventsResult = service.events().list(calendarId=calendar['id'], timeMin=start, timeMax=end, singleEvents=True, orderBy='startTime', timeZone=timezone).execute()
+        eventsResult = service.events().list(
+            calendarId=calendar['id'],
+            timeMin=start,
+            timeMax=end,
+            singleEvents=True,
+            orderBy='startTime',
+            timeZone=timezone
+        ).execute()
         logging.debug('_request_data:request end')
 
     eventsResult['items'] = eventsResult.get('items', [])
     for event in eventsResult['items']:
-        event['parsed_start'] = dateutil.parser.parse(event['start']['dateTime']) if 'dateTime' in event['start'] else timezone.localize(dateutil.parser.parse(event['start']['date']))
-        event['parsed_end'] = dateutil.parser.parse(event['end']['dateTime']) if 'dateTime' in event['end'] else timezone.localize(dateutil.parser.parse(event['end']['date']))
+        event['parsed_start'] = (
+            dateutil.parser.parse(event['start']['dateTime']) if 'dateTime' in event['start']
+            else timezone.localize(dateutil.parser.parse(event['start']['date']))
+        )
+        event['parsed_end'] = (
+            dateutil.parser.parse(event['end']['dateTime']) if 'dateTime' in event['end']
+            else timezone.localize(dateutil.parser.parse(event['end']['date']))
+        )
         event['all_day'] = 'date' in event['start']
     logging.debug('_request_data:end')
     return eventsResult['items']
+
 
 def _calendar_data(tz_aware_when_start, tz_aware_when_end, calendar, timezone):
     events = _request_data(tz_aware_when_start, tz_aware_when_end, calendar, timezone)
@@ -110,6 +134,7 @@ def _calendar_data(tz_aware_when_start, tz_aware_when_end, calendar, timezone):
         })
     return cleaned_events
 
+
 def _fetch_events(first_day, last_day, calendars, timezone):
     logging.debug('_fetch_events')
     events = []
@@ -117,6 +142,7 @@ def _fetch_events(first_day, last_day, calendars, timezone):
         events.extend(_calendar_data(first_day, last_day, calendar, timezone))
     events.sort(key=lambda e: e['start'])
     return events
+
 
 def _segment_events(tz_aware_when, today, plus_one, plus_two, plus_three, events):
     """
@@ -193,12 +219,18 @@ def _segment_events(tz_aware_when, today, plus_one, plus_two, plus_three, events
     """
     retVal = {'today': [], 'plus_one': [], 'plus_two': [], 'plus_three': []}
     for event in events:
-        if event['end'] < tz_aware_when: continue # Skip events that are already over
-        if event['start'] < plus_one and event['end'] > today: retVal['today'].append(event)
-        if event['start'] < plus_two and event['end'] > plus_one: retVal['plus_one'].append(event)
-        if event['start'] < plus_three and event['end'] > plus_two: retVal['plus_two'].append(event)
-        if event['end'] > plus_three: retVal['plus_three'].append(event)
+        if event['end'] < tz_aware_when:
+            continue  # Skip events that are already over
+        if event['start'] < plus_one and event['end'] > today:
+            retVal['today'].append(event)
+        if event['start'] < plus_two and event['end'] > plus_one:
+            retVal['plus_one'].append(event)
+        if event['start'] < plus_three and event['end'] > plus_two:
+            retVal['plus_two'].append(event)
+        if event['end'] > plus_three:
+            retVal['plus_three'].append(event)
     return retVal
+
 
 def fetch(tz_aware_when):
     logging.debug('fetch')
@@ -208,6 +240,7 @@ def fetch(tz_aware_when):
     plus_three = plus_two + datetime.timedelta(days=1)
     fetched_events = _fetch_events(today, plus_three, CALENDARS, tz_aware_when.tzinfo)
     return _segment_events(tz_aware_when, today, plus_one, plus_two, plus_three, fetched_events)
+
 
 def generate_credentials():
     '''Requires web browser available to handle authorization flow'''
@@ -219,6 +252,7 @@ def generate_credentials():
         flow.user_agent = APPLICATION_NAME
         credentials = tools.run_flow(flow, store)
     return credentials
+
 
 def list_calendars():
     logging.debug('list_calendars')
@@ -234,4 +268,3 @@ def list_calendars():
             'description': item.get('description', ''),
         })
     return cleaned_calendars
-
