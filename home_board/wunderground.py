@@ -43,9 +43,9 @@ def _wunderground_data():
 
     current, forecasts = _request_data(api_key, PWS_ID)
     cleaned_current = {
-        'time': current['observation_time'],
+        # 'time': current['observation_time'],
         'temperature': current['temp_f'],
-        'wind': current['wind_mph'],
+        # 'wind': current['wind_mph'],
         'description': current['weather'],
         'icon': current['icon']
     }
