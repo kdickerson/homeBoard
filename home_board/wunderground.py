@@ -9,6 +9,7 @@ CLIENT_SECRET_FILE = 'private/wunderground.key'
 PWS_ID = 'KCALIVER107'  # Wunderground Personal Weather Station ID
 MOCK_WUNDERGROUND_DATA = False
 MOCK_WUNDERGROUND_DATA_FILE = 'mock_data/mock_wunderground_data.json'
+QUERY_URL = 'http://api.wunderground.com/api/{api_key}/conditions/forecast/q/pws:{pws_id}.json'
 
 
 def _request_data(api_key, pws_id):
@@ -17,8 +18,7 @@ def _request_data(api_key, pws_id):
         with open(local_file(MOCK_WUNDERGROUND_DATA_FILE)) as mock_data:
             json_string = mock_data.read()
     else:
-        query_url = 'http://api.wunderground.com/api/{api_key}/conditions/forecast/q/pws:{pws_id}.json'
-        query_url = query_url.format(api_key=api_key, pws_id=pws_id)
+        query_url = QUERY_URL.format(api_key=api_key, pws_id=pws_id)
         with urlopen(query_url, timeout=60) as response:
             json_string = response.read().decode('utf8')
     parsed_json = json.loads(json_string)
