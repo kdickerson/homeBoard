@@ -4,7 +4,7 @@ A set of scripts to load "agenda" data and display it on a [Waveshare ePaper dis
 
 Written for Python3 (tested on 3.5), utilizes pipenv.
 
-Pulls weather conditions and forecasting from [Weather Underground](https://www.wunderground.com/weather/api/) (API Key required).
+Pulls weather conditions and forecasting from the [National Weather Service](https://www.weather.gov/documentation/services-web-api) (NO API Key required).
 
 Pulls Calendering information from [Google Calendar](https://developers.google.com/google-apps/calendar/) (OAuth2 authentication required).
 
@@ -56,4 +56,3 @@ Example Crontab entries using Flock to avoid simultaneous executions (which usua
     > */15 7-21 * * * /usr/bin/flock -n /home/pi/homeBoard_cron.lock -c "/home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard"
     > # Only update once per hour overnight
     > 0 22-23,0-6 * * * /usr/bin/flock -n /home/pi/homeBoard_cron.lock -c "/home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard"
-
