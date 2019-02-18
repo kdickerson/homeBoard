@@ -67,19 +67,27 @@ EVENTS = [
     {'year': 2025, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
 
     # Family Events
-    {'month': 3, 'day': 17, 'header': 'Birthday', 'title': 'Corinne', 'msg': 'Happy Birthday, Corinne!', 'icon': 'birthday'},
+    {'month': 3, 'day': 17, 'header': 'Birthday', 'title': 'Corinne', 'msg': 'Happy Birthday, Corinne!', 'icon': 'birthday'},  # noqa: E501
     {'month': 6, 'day': 9, 'header': 'Birthday', 'title': 'Kyle', 'msg': 'Happy Birthday, Kyle!', 'icon': 'birthday'},
     {'month': 9, 'day': 20, 'header': 'Birthday', 'title': 'Jess', 'msg': 'Happy Birthday, Jess!', 'icon': 'birthday'},
-    {'month': 10, 'day': 28, 'header': 'Birthday', 'title': 'Heather', 'msg': 'Happy Birthday, Heather!', 'icon': 'birthday'},
-    {'month': 6, 'day': 23, 'header': 'Anniversary', 'title': 'Kyle & Jess', 'msg': 'Happy Anniversary!', 'icon': 'birthday'},
+    {'month': 10, 'day': 28, 'header': 'Birthday', 'title': 'Heather', 'msg': 'Happy Birthday, Heather!', 'icon': 'birthday'},  # noqa: E501
+    {'month': 6, 'day': 23, 'header': 'Anniversary', 'title': 'Kyle & Jess', 'msg': 'Happy Anniversary!', 'icon': 'birthday'},  # noqa: E501
 
 ]
 
+
 def _find_event_for_day(day):
-    return next((e for e in EVENTS if day.month == e['month'] and day.day == e['day'] and ('year' not in e or day.year == e['year'])), None)
+    return next(
+        (
+            e for e in EVENTS if day.month == e['month']
+            and day.day == e['day']
+            and ('year' not in e or day.year == e['year'])
+        ), None
+    )
+
 
 def fetch(today):
-    #today = datetime.date(2018, 12, 25)
+    # today = datetime.date(2018, 12, 25)
     plus_one = today + datetime.timedelta(days=1)
     plus_two = plus_one + datetime.timedelta(days=1)
     plus_three = plus_two + datetime.timedelta(days=1)

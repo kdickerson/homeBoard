@@ -1,16 +1,13 @@
 [[source]]
-
 url = "https://pypi.python.org/simple"
 verify_ssl = true
 name = "pypi"
 
-
 [dev-packages]
-
-
+flake8 = "*"
+flake8-isort = "*"
 
 [packages]
-
 setuptools = "*"
 spidev = "*"
 "rpi.gpio" = "*"
@@ -19,7 +16,5 @@ google-api-python-client = "*"
 pytz = "*"
 python-dateutil = "*"
 
-
 [requires]
-
 python_version = "3.5"
