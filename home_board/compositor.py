@@ -44,8 +44,10 @@ WEATHER_ICON_MAP = {
 EVENT_ICON_MAP = {
     'birthday': 'birthday.bmp',
     'christmas': 'christmas.bmp',
+    'flag': 'flag.bmp',
     'halloween': 'halloween.bmp',
-    'thanksgiving': 'thanksgiving.bmp'
+    'heart': 'heart.bmp',
+    'thanksgiving': 'thanksgiving.bmp',
 }
 
 WEATHER_ICON_PATH = 'icons/weather/'
