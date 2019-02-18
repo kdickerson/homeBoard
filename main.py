@@ -7,8 +7,9 @@ import sys
 
 import pytz
 
-from home_board import calendar, compositor, special_events, util
-from home_board import wunderground as weather
+from home_board import calendar, compositor
+from home_board import nws as weather
+from home_board import special_events, util
 
 TIME_ZONE = "America/Los_Angeles"
 SAVE_MOCK = False
@@ -77,13 +78,6 @@ def fetch_weather(context, days):
             if SAVE_MOCK:
                 with open(util.local_file(MOCK_WEATHER_FILE), 'wb') as mock_data:
                     pickle.dump(conditions, mock_data)
-            # Test date of forecast and throw away if not correct
-            forecast_date = datetime.datetime.fromtimestamp(
-                conditions['forecast']['today']['epoch'], context['now'].tzinfo
-            )
-            if forecast_date.date() != context['now'].date():
-                raise ValueError("Weather forecast date is not accurate. Received " +
-                                 forecast_date.date().strftime('%Y-%m-%d'))
         context['today']['conditions'] = conditions['current']
         for day in days:
             context[day]['forecast'] = conditions['forecast'][day]

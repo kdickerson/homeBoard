@@ -139,6 +139,8 @@ def _draw_calendar(image, draw, events, offset, bottom, cal_header_font, descrip
 
 def _draw_forecast_and_current(image, draw, conditions, forecast, header_font, temp_font):
     logging.debug('_draw_forecast_and_current:start')
+    logging.debug('current: ' + str(conditions))
+    logging.debug('forecast: ' + str(forecast))
     SUB_COLUMN_WIDTH = COLUMN_WIDTH // 2
 
     # Sub column 1:
@@ -174,6 +176,7 @@ def _draw_forecast_and_current(image, draw, conditions, forecast, header_font, t
 
 def _draw_forecast(image, draw, column_left, forecast, header_font, temp_font):
     logging.debug('_draw_forecast:start')
+    logging.debug('forecast: ' + str(forecast))
     msg = str(forecast['low-temperature']) + '–' + str(forecast['high-temperature'])  # Center before adding the °
     _draw_centered_text(draw, (column_left, WEATHER_TEMP_TOP), COLUMN_WIDTH, msg + '°', temp_font, measure_text=msg)
     try:
