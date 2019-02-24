@@ -19,7 +19,7 @@ ICON_EXTRACTOR_REGEX = 'https://api.weather.gov/icons/land/(?:day|night)/(\\w+).
 ICON_EXTRACTOR = re.compile(ICON_EXTRACTOR_REGEX)
 
 # List of NWS Icons found at https://api.weather.gov/icons
-# Map NWS Icon values to match the strings used by WUnderground and expected by Compositor
+# Map NWS Icon values to match the strings expected by Compositor
 ICON_MAP = {
     'bkn': 'mostlycloudy',
     'blizzard': 'snow',
@@ -50,11 +50,11 @@ ICON_MAP = {
     'tsra_hi': 'tstorms',
     'tsra_sct': 'tstorms',
     'tsra': 'tstorms',
-    'wind_bkn': 'mostlycloudy',
-    'wind_few': 'clear',
-    'wind_ovc': 'mostlycloudy',
-    'wind_sct': 'partlycloudy',
-    'wind_skc': 'clear',
+    'wind_bkn': 'cloudy_windy',
+    'wind_few': 'windy',
+    'wind_ovc': 'cloudy_windy',
+    'wind_sct': 'cloudy_windy',
+    'wind_skc': 'windy',
 }
 
 

@@ -27,6 +27,7 @@ WEATHER_ICON_MAP = {
     'chancetstorms': 'chancetstorms.bmp',
     'clear': 'sunny.bmp',
     'cloudy': 'cloudy.bmp',
+    'cloudy_windy': 'cloudy_windy.bmp',
     'flurries': 'snow.bmp',
     'fog': 'fog.bmp',
     'hazy': 'hazy.bmp',
@@ -39,6 +40,7 @@ WEATHER_ICON_MAP = {
     'sunny': 'sunny.bmp',
     'tstorms': 'tstorms.bmp',
     'unknown': 'sunny.bmp',
+    'windy': 'windy.bmp',
 }
 
 EVENT_ICON_MAP = {
