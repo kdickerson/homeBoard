@@ -37,7 +37,8 @@ Current weather conditions are displayed in red.
 Calendar events that are currently happening are displayed in red.
 Special Event messages are displayed in red.
 
-Original icons from flaticons.net and then modified.
+Original icons from flaticons.net and then modified, except windy.bmp and cloudy_windy.bmp.
+windy.bmp and cloudy_windy.bmp modified from https://www.flaticon.com/free-icon/wind_56086, original by Yannick.
 
 Run DocTests:
 
