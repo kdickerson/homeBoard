@@ -69,6 +69,21 @@ def _coalesce_forecasts(forecasts):
     '''
     by_date = {}
     for forecast in forecasts:
+        if forecast['name'] == 'Tonight':
+            # Need to populate tonight as the first entry in our coalesced forecasts, otherwise the forecast
+            # displayed jumps to tomorrow's and it's off by a day until midnight.
+            time_string = forecast['startTime']  # 2019-02-16T18:00:00-08:00
+            if ":" == time_string[-3:-2]:  # Remove the colon from the timezone data
+                time_string = time_string[:-3] + time_string[-2:]
+            startTime = datetime.datetime.strptime(time_string, '%Y-%m-%dT%H:%M:%S%z')  # 2019-02-16T18:00:00-0800
+            by_date[startTime.date()] = {
+                'date': startTime.date(),
+                'high': forecast['temperature'],
+                'low': forecast['temperature'],
+                'description': forecast['shortForecast'],
+                'icon': forecast['icon'],
+            }
+
         time_string = forecast['endTime']  # 2019-02-16T18:00:00-08:00
         if ":" == time_string[-3:-2]:  # Remove the colon from the timezone data
             time_string = time_string[:-3] + time_string[-2:]
