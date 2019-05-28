@@ -62,6 +62,24 @@ def _celsius_to_fahrenheit(degrees):
     return round((degrees * 9/5) + 32)
 
 
+def _extract_datetime(time_string):
+    # time_string: 2019-02-16T18:00:00-08:00
+    if ":" == time_string[-3:-2]:  # Remove the colon from the timezone data
+        time_string = time_string[:-3] + time_string[-2:]
+    return datetime.datetime.strptime(time_string, '%Y-%m-%dT%H:%M:%S%z')  # 2019-02-16T18:00:00-0800
+
+
+def _populate_date(entry, forecast, prefer_desc_icon=False):
+    if entry['low'] is None or forecast['temperature'] < entry['low']:
+        entry['low'] = forecast['temperature']
+    if entry['high'] is None or forecast['temperature'] > entry['high']:
+        entry['high'] = forecast['temperature']
+    if entry['description'] is None or prefer_desc_icon:
+        entry['description'] = forecast['shortForecast']
+    if entry['icon'] is None or prefer_desc_icon:
+        entry['icon'] = forecast['icon']
+
+
 def _coalesce_forecasts(forecasts):
     '''
         NWS returns forecasts in half-day increments.
@@ -69,37 +87,19 @@ def _coalesce_forecasts(forecasts):
     '''
     by_date = {}
     for forecast in forecasts:
-        if forecast['name'] == 'Tonight':
-            # Need to populate tonight as the first entry in our coalesced forecasts, otherwise the forecast
-            # displayed jumps to tomorrow's and it's off by a day until midnight.
-            time_string = forecast['startTime']  # 2019-02-16T18:00:00-08:00
-            if ":" == time_string[-3:-2]:  # Remove the colon from the timezone data
-                time_string = time_string[:-3] + time_string[-2:]
-            startTime = datetime.datetime.strptime(time_string, '%Y-%m-%dT%H:%M:%S%z')  # 2019-02-16T18:00:00-0800
-            by_date[startTime.date()] = {
-                'date': startTime.date(),
-                'high': forecast['temperature'],
-                'low': forecast['temperature'],
-                'description': forecast['shortForecast'],
-                'icon': forecast['icon'],
-            }
+        startTime = _extract_datetime(forecast['startTime'])
+        endTime = _extract_datetime(forecast['endTime'])
 
-        time_string = forecast['endTime']  # 2019-02-16T18:00:00-08:00
-        if ":" == time_string[-3:-2]:  # Remove the colon from the timezone data
-            time_string = time_string[:-3] + time_string[-2:]
-        endTime = datetime.datetime.strptime(time_string, '%Y-%m-%dT%H:%M:%S%z')  # 2019-02-16T18:00:00-0800
-
+        if startTime.date() not in by_date:
+            by_date[startTime.date()] = {'date': startTime.date(), 'high': None, 'low': None,
+                                         'description': None, 'icon': None}
         if endTime.date() not in by_date:
-            by_date[endTime.date()] = {'date': None, 'high': '-', 'low': '-', 'description': None, 'icon': None}
+            by_date[endTime.date()] = {'date': endTime.date(), 'high': None, 'low': None,
+                                       'description': None, 'icon': None}
 
-        if endTime.time().hour >= 12:
-            by_date[endTime.date()]['date'] = endTime.date()
-            by_date[endTime.date()]['high'] = forecast['temperature']
-            by_date[endTime.date()]['description'] = forecast['shortForecast']
-            by_date[endTime.date()]['icon'] = forecast['icon']
-        else:
-            by_date[endTime.date()]['date'] = endTime.date()  # Always set date. Ensure we have it for half increments
-            by_date[endTime.date()]['low'] = forecast['temperature']  # The low from the night leading into this date
+        _populate_date(by_date[startTime.date()], forecast, True)  # Prefer description and icon of startDate
+        if endTime.date() != startTime.date():
+            _populate_date(by_date[endTime.date()], forecast)
 
     coalesced_forecasts = sorted(by_date.values(), key=lambda forecast: forecast['date'])
     logging.debug('Coalesced Forecasts:' + str(coalesced_forecasts))
