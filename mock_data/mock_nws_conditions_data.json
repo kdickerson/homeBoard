@@ -1,170 +1,157 @@
 {
-  "@context": [
-    "https://raw.githubusercontent.com/geojson/geojson-ld/master/contexts/geojson-base.jsonld",
-    {
-      "wx": "https://api.weather.gov/ontology#",
-      "s": "https://schema.org/",
-      "geo": "http://www.opengis.net/ont/geosparql#",
-      "unit": "http://codes.wmo.int/common/unit/",
-      "@vocab": "https://api.weather.gov/ontology#",
-      "geometry": {
-        "@id": "s:GeoCoordinates",
-        "@type": "geo:wktLiteral"
-      },
-      "city": "s:addressLocality",
-      "state": "s:addressRegion",
-      "distance": {
-        "@id": "s:Distance",
-        "@type": "s:QuantitativeValue"
-      },
-      "bearing": {
-        "@type": "s:QuantitativeValue"
-      },
-      "value": {
-        "@id": "s:value"
-      },
-      "unitCode": {
-        "@id": "s:unitCode",
-        "@type": "@id"
-      },
-      "forecastOffice": {
-        "@type": "@id"
-      },
-      "forecastGridData": {
-        "@type": "@id"
-      },
-      "publicZone": {
-        "@type": "@id"
-      },
-      "county": {
-        "@type": "@id"
-      }
+    "@context": [
+        "https://geojson.org/geojson-ld/geojson-context.jsonld",
+        {
+            "@version": "1.1",
+            "wx": "https://api.weather.gov/ontology#",
+            "s": "https://schema.org/",
+            "geo": "http://www.opengis.net/ont/geosparql#",
+            "unit": "http://codes.wmo.int/common/unit/",
+            "@vocab": "https://api.weather.gov/ontology#",
+            "geometry": {
+                "@id": "s:GeoCoordinates",
+                "@type": "geo:wktLiteral"
+            },
+            "city": "s:addressLocality",
+            "state": "s:addressRegion",
+            "distance": {
+                "@id": "s:Distance",
+                "@type": "s:QuantitativeValue"
+            },
+            "bearing": {
+                "@type": "s:QuantitativeValue"
+            },
+            "value": {
+                "@id": "s:value"
+            },
+            "unitCode": {
+                "@id": "s:unitCode",
+                "@type": "@id"
+            },
+            "forecastOffice": {
+                "@type": "@id"
+            },
+            "forecastGridData": {
+                "@type": "@id"
+            },
+            "publicZone": {
+                "@type": "@id"
+            },
+            "county": {
+                "@type": "@id"
+            }
+        }
+    ],
+    "id": "https://api.weather.gov/stations/KLVK/observations/2020-06-19T00:53:00+00:00",
+    "type": "Feature",
+    "geometry": {
+        "type": "Point",
+        "coordinates": [
+            -121.81999999999999,
+            37.700000000000003
+        ]
+    },
+    "properties": {
+        "@id": "https://api.weather.gov/stations/KLVK/observations/2020-06-19T00:53:00+00:00",
+        "@type": "wx:ObservationStation",
+        "elevation": {
+            "value": "121",
+            "unitCode": "unit:m"
+        },
+        "station": "https://api.weather.gov/stations/KLVK",
+        "timestamp": "2020-06-19T00:53:00+00:00",
+        "rawMessage": "KLVK 190053Z 27014KT 10SM CLR 31/03 A2982 RMK AO2 SLP092 T03110033",
+        "textDescription": "Clear",
+        "icon": "https://api.weather.gov/icons/land/night/clr?size=medium",
+        "presentWeather": [],
+        "temperature": {
+            "value": "31.1",
+            "unitCode": "unit:degC",
+            "qualityControl": "qc:V"
+        },
+        "dewpoint": {
+            "value": "3.3",
+            "unitCode": "unit:degC",
+            "qualityControl": "qc:V"
+        },
+        "windDirection": {
+            "value": "270",
+            "unitCode": "unit:degree_(angle)",
+            "qualityControl": "qc:V"
+        },
+        "windSpeed": {
+            "value": "25.919999999999999999999999999979",
+            "unitCode": "unit:km_h-1",
+            "qualityControl": "qc:V"
+        },
+        "windGust": {
+            "value": null,
+            "unitCode": "unit:km_h-1",
+            "qualityControl": "qc:Z"
+        },
+        "barometricPressure": {
+            "value": "100980",
+            "unitCode": "unit:Pa",
+            "qualityControl": "qc:V"
+        },
+        "seaLevelPressure": {
+            "value": "100920",
+            "unitCode": "unit:Pa",
+            "qualityControl": "qc:V"
+        },
+        "visibility": {
+            "value": "16090",
+            "unitCode": "unit:m",
+            "qualityControl": "qc:C"
+        },
+        "maxTemperatureLast24Hours": {
+            "value": null,
+            "unitCode": "unit:degC",
+            "qualityControl": null
+        },
+        "minTemperatureLast24Hours": {
+            "value": null,
+            "unitCode": "unit:degC",
+            "qualityControl": null
+        },
+        "precipitationLastHour": {
+            "value": null,
+            "unitCode": "unit:m",
+            "qualityControl": "qc:Z"
+        },
+        "precipitationLast3Hours": {
+            "value": null,
+            "unitCode": "unit:m",
+            "qualityControl": "qc:Z"
+        },
+        "precipitationLast6Hours": {
+            "value": null,
+            "unitCode": "unit:m",
+            "qualityControl": "qc:Z"
+        },
+        "relativeHumidity": {
+            "value": "17.146543258398",
+            "unitCode": "unit:percent",
+            "qualityControl": "qc:V"
+        },
+        "windChill": {
+            "value": null,
+            "unitCode": "unit:degC",
+            "qualityControl": "qc:V"
+        },
+        "heatIndex": {
+            "value": "29.071450931062777777777777777778",
+            "unitCode": "unit:degC",
+            "qualityControl": "qc:V"
+        },
+        "cloudLayers": [
+            {
+                "base": {
+                    "value": null,
+                    "unitCode": "unit:m"
+                },
+                "amount": "CLR"
+            }
+        ]
     }
-  ],
-  "id": "https://api.weather.gov/stations/KLVK/observations/2019-02-16T22:53:00+00:00",
-  "type": "Feature",
-  "geometry": {
-    "type": "Point",
-    "coordinates": [
-      -121.82,
-      37.7
-    ]
-  },
-  "properties": {
-    "@id": "https://api.weather.gov/stations/KLVK/observations/2019-02-16T22:53:00+00:00",
-    "@type": "wx:ObservationStation",
-    "elevation": {
-      "value": 121,
-      "unitCode": "unit:m"
-    },
-    "station": "https://api.weather.gov/stations/KLVK",
-    "timestamp": "2019-02-16T22:53:00+00:00",
-    "rawMessage": "KLVK 162253Z 24014KT 10SM FEW025 SCT080 SCT100 10/06 A3011 RMK AO2 SLP197 T01000056",
-    "textDescription": "Partly Cloudy",
-    "icon": "https://api.weather.gov/icons/land/day/sct?size=medium",
-    "presentWeather": [],
-    "temperature": {
-      "value": 10,
-      "unitCode": "unit:degC",
-      "qualityControl": "qc:V"
-    },
-    "dewpoint": {
-      "value": 5.600000000000023,
-      "unitCode": "unit:degC",
-      "qualityControl": "qc:V"
-    },
-    "windDirection": {
-      "value": 239.99999999999997,
-      "unitCode": "unit:degree_(angle)",
-      "qualityControl": "qc:V"
-    },
-    "windSpeed": {
-      "value": 7.2,
-      "unitCode": "unit:m_s-1",
-      "qualityControl": "qc:V"
-    },
-    "windGust": {
-      "value": null,
-      "unitCode": "unit:m_s-1",
-      "qualityControl": "qc:Z"
-    },
-    "barometricPressure": {
-      "value": 101970,
-      "unitCode": "unit:Pa",
-      "qualityControl": "qc:V"
-    },
-    "seaLevelPressure": {
-      "value": 101970,
-      "unitCode": "unit:Pa",
-      "qualityControl": "qc:V"
-    },
-    "visibility": {
-      "value": 16090,
-      "unitCode": "unit:m",
-      "qualityControl": "qc:C"
-    },
-    "maxTemperatureLast24Hours": {
-      "value": null,
-      "unitCode": "unit:degC",
-      "qualityControl": null
-    },
-    "minTemperatureLast24Hours": {
-      "value": null,
-      "unitCode": "unit:degC",
-      "qualityControl": null
-    },
-    "precipitationLastHour": {
-      "value": null,
-      "unitCode": "unit:m",
-      "qualityControl": "qc:Z"
-    },
-    "precipitationLast3Hours": {
-      "value": null,
-      "unitCode": "unit:m",
-      "qualityControl": "qc:Z"
-    },
-    "precipitationLast6Hours": {
-      "value": null,
-      "unitCode": "unit:m",
-      "qualityControl": "qc:Z"
-    },
-    "relativeHumidity": {
-      "value": 74.11362974689052,
-      "unitCode": "unit:percent",
-      "qualityControl": "qc:C"
-    },
-    "windChill": {
-      "value": null,
-      "unitCode": "unit:degC",
-      "qualityControl": "qc:V"
-    },
-    "heatIndex": {
-      "value": null,
-      "unitCode": "unit:degC",
-      "qualityControl": "qc:V"
-    },
-    "cloudLayers": [
-      {
-        "base": {
-          "value": 760,
-          "unitCode": "unit:m"
-        },
-        "amount": "FEW"
-      },
-      {
-        "base": {
-          "value": 2440,
-          "unitCode": "unit:m"
-        },
-        "amount": "SCT"
-      },
-      {
-        "base": {
-          "value": 3050,
-          "unitCode": "unit:m"
-        },
-        "amount": "SCT"
-      }
-    ]
-  }
 }
