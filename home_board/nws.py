@@ -59,7 +59,15 @@ ICON_MAP = {
 
 
 def _celsius_to_fahrenheit(degrees):
-    return round((degrees * 9/5) + 32)
+    """
+    >>> _celsius_to_fahrenheit(0)
+    32
+    >>> _celsius_to_fahrenheit('23.4')
+    74
+    >>> _celsius_to_fahrenheit(34.5)
+    94
+    """
+    return int(round((float(degrees) * 9/5) + 32))
 
 
 def _extract_datetime(time_string):
@@ -158,7 +166,11 @@ def _extract_icon(raw_icon):
 
 
 def _normalize_icon(nws_icon):
-    return ICON_MAP[nws_icon] if nws_icon is not None else 'unknown'
+    try:
+        return ICON_MAP[nws_icon] if nws_icon is not None else 'unknown'
+    except KeyError:
+        logging.warn('Unknown icon specified: ' + str(nws_icon))
+        return 'unknown'
 
 
 def _nws_data():
