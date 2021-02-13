@@ -1,4 +1,5 @@
 # Fetch weather info from National Weather Service
+# https://www.weather.gov/documentation/services-web-api
 import datetime
 import json
 import logging
@@ -8,9 +9,11 @@ from urllib.request import Request, urlopen
 from .util import local_file
 
 CONDITIONS_STATION_ID = 'KLVK'  # NWS Station ID to get latest observation
-FORECAST_COORDINATES = '37.690835,-121.786962'  # GPS Coordinates for which to get the forecast; No space between
+# Obtain forecast officeID and gridpoint using GPS coordinates: https://api.weather.gov/points/37.6908,-121.787
+FORECAST_OFFICE_ID = 'MTR'
+FORECAST_GRIDPOINT = '109,118'
 CONDITIONS_URL = 'https://api.weather.gov/stations/{station_id}/observations/latest?require_qc=false'
-FORECAST_URL = 'https://api.weather.gov/points/{coordinates}/forecast'
+FORECAST_URL = 'https://api.weather.gov/gridpoints/{office_id}/{gridpoint}/forecast'
 MOCK_NWS_DATA = False
 MOCK_NWS_CONDITIONS_DATA_FILE = 'mock_data/mock_nws_conditions_data.json'
 MOCK_NWS_FORECAST_DATA_FILE = 'mock_data/mock_nws_forecast_data.json'
@@ -114,7 +117,7 @@ def _coalesce_forecasts(forecasts):
     return coalesced_forecasts
 
 
-def _request_data(station_id, coordinates):
+def _request_data(station_id, office_id, gridpoint):
     logging.debug('_request_data:start')
     if MOCK_NWS_DATA:
         with open(local_file(MOCK_NWS_CONDITIONS_DATA_FILE)) as mock_data:
@@ -131,7 +134,7 @@ def _request_data(station_id, coordinates):
         with urlopen(conditions_request, timeout=60) as response:
             conditions_json_string = response.read().decode('utf8')
 
-        forecast_url = FORECAST_URL.format(coordinates=coordinates)
+        forecast_url = FORECAST_URL.format(gridpoint=gridpoint, office_id=office_id)
         logging.debug("NWS Forecast URL: " + forecast_url)
         forecast_request = Request(forecast_url, headers={
             'User-Agent': 'https://github.com/kdickerson/homeBoard',
@@ -175,7 +178,7 @@ def _normalize_icon(nws_icon):
 
 def _nws_data():
     logging.debug('_nws_data:start')
-    current, forecasts = _request_data(CONDITIONS_STATION_ID, FORECAST_COORDINATES)
+    current, forecasts = _request_data(CONDITIONS_STATION_ID, FORECAST_OFFICE_ID, FORECAST_GRIDPOINT)
 
     cleaned_current = {
         'temperature': _celsius_to_fahrenheit(current['temperature']['value']),
