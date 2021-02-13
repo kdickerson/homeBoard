@@ -15,6 +15,7 @@ pillow = "*"
 google-api-python-client = "*"
 pytz = "*"
 python-dateutil = "*"
+oauth2client = "*"
 
 [requires]
 python_version = "3.5"
