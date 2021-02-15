@@ -159,7 +159,18 @@ def fetch_data():
         try:
             with open(CACHE_FILE, 'rb') as cache_file:
                 cache = pickle.load(cache_file)
-                deep_defaults(context, cache)
+                for day in days:
+                    entry = context[day]
+                    cache_entry = cache[day]
+                    if not context['success']['calendar'] and cache_entry['events']:
+                        deep_defaults(entry['events'], cache_entry['events'])
+                    if not context['success']['weather']:
+                        if cache_entry['conditions']:
+                            deep_defaults(entry['conditions'], cache_entry['conditions'])
+                        if cache_entry['forecast']:
+                            deep_defaults(entry['forecast'], cache_entry['forecast'])
+                    if not context['success']['special-events'] and cache_entry['special_event']:
+                        deep_defaults(entry['special_event'], cache_entry['special_event'])
         except:  # noqa: E722
             logging.exception(
                 'Exception loading data from cache_file: ' +
