@@ -4,6 +4,8 @@ import datetime
 import json
 import logging
 import re
+from typing import Dict
+from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 from .util import local_file
@@ -61,7 +63,7 @@ ICON_MAP = {
 }
 
 
-def _celsius_to_fahrenheit(degrees):
+def _celsius_to_fahrenheit(degrees) -> int:
     """
     >>> _celsius_to_fahrenheit(0)
     32
@@ -73,14 +75,14 @@ def _celsius_to_fahrenheit(degrees):
     return int(round((float(degrees) * 9/5) + 32))
 
 
-def _extract_datetime(time_string):
+def _extract_datetime(time_string: str) -> datetime.datetime:
     # time_string: 2019-02-16T18:00:00-08:00
     if ":" == time_string[-3:-2]:  # Remove the colon from the timezone data
         time_string = time_string[:-3] + time_string[-2:]
     return datetime.datetime.strptime(time_string, '%Y-%m-%dT%H:%M:%S%z')  # 2019-02-16T18:00:00-0800
 
 
-def _populate_date(entry, forecast, prefer_desc_icon=False):
+def _populate_date(entry: Dict, forecast: Dict, prefer_desc_icon=False) -> None:
     if entry['low'] is None or forecast['temperature'] < entry['low']:
         entry['low'] = forecast['temperature']
     if entry['high'] is None or forecast['temperature'] > entry['high']:
@@ -91,7 +93,7 @@ def _populate_date(entry, forecast, prefer_desc_icon=False):
         entry['icon'] = forecast['icon']
 
 
-def _coalesce_forecasts(forecasts):
+def _coalesce_forecasts(forecasts: Dict) -> Dict:
     '''
         NWS returns forecasts in half-day increments.
         This coalesces those increments into whole-day values that the rest of the code expects.
@@ -117,13 +119,11 @@ def _coalesce_forecasts(forecasts):
     return coalesced_forecasts
 
 
-def _request_data(station_id, office_id, gridpoint):
-    logging.debug('_request_data:start')
+def _request_current_conditions(station_id: str) -> Dict:
+    logging.debug('_request_current_conditions:start')
     if MOCK_NWS_DATA:
         with open(local_file(MOCK_NWS_CONDITIONS_DATA_FILE)) as mock_data:
             conditions_json_string = mock_data.read()
-        with open(local_file(MOCK_NWS_FORECAST_DATA_FILE)) as mock_data:
-            forecast_json_string = mock_data.read()
     else:
         conditions_url = CONDITIONS_URL.format(station_id=station_id)
         logging.debug("NWS Conditions URL: " + conditions_url)
@@ -134,6 +134,18 @@ def _request_data(station_id, office_id, gridpoint):
         with urlopen(conditions_request, timeout=60) as response:
             conditions_json_string = response.read().decode('utf8')
 
+    conditions_parsed_json = json.loads(conditions_json_string)
+    conditions = conditions_parsed_json['properties']
+    logging.debug('_request_current_conditions:end')
+    return conditions
+
+
+def _request_forecasts(office_id: str, gridpoint: str) -> Dict:
+    logging.debug('_request_forecasts:start')
+    if MOCK_NWS_DATA:
+        with open(local_file(MOCK_NWS_FORECAST_DATA_FILE)) as mock_data:
+            forecast_json_string = mock_data.read()
+    else:
         forecast_url = FORECAST_URL.format(gridpoint=gridpoint, office_id=office_id)
         logging.debug("NWS Forecast URL: " + forecast_url)
         forecast_request = Request(forecast_url, headers={
@@ -143,14 +155,13 @@ def _request_data(station_id, office_id, gridpoint):
         with urlopen(forecast_request, timeout=60) as response:
             forecast_json_string = response.read().decode('utf8')
 
-    conditions_parsed_json = json.loads(conditions_json_string)
     forecast_parsed_json = json.loads(forecast_json_string)
     forecasts = _coalesce_forecasts(forecast_parsed_json['properties']['periods'])
-    logging.debug('_request_data:end')
-    return conditions_parsed_json['properties'], forecasts
+    logging.debug('_request_forecasts:end')
+    return forecasts
 
 
-def _extract_cleaned_forecast(day_idx, forecasts):
+def _extract_cleaned_forecast(day_idx: int, forecasts: Dict) -> Dict:
     return {
         'low-temperature': forecasts[day_idx]['low'],
         'high-temperature': forecasts[day_idx]['high'],
@@ -160,7 +171,7 @@ def _extract_cleaned_forecast(day_idx, forecasts):
     }
 
 
-def _extract_icon(raw_icon):
+def _extract_icon(raw_icon: str) -> str:
     icon = None
     icon_match = ICON_EXTRACTOR.match(raw_icon)
     if icon_match:
@@ -168,7 +179,7 @@ def _extract_icon(raw_icon):
     return icon
 
 
-def _normalize_icon(nws_icon):
+def _normalize_icon(nws_icon: str) -> str:
     try:
         return ICON_MAP[nws_icon] if nws_icon is not None else 'unknown'
     except KeyError:
@@ -176,29 +187,20 @@ def _normalize_icon(nws_icon):
         return 'unknown'
 
 
-def _nws_data():
-    logging.debug('_nws_data:start')
-    current, forecasts = _request_data(CONDITIONS_STATION_ID, FORECAST_OFFICE_ID, FORECAST_GRIDPOINT)
-
-    cleaned_current = {
+def fetch_current_conditions() -> Dict:
+    current = _request_current_conditions(CONDITIONS_STATION_ID)
+    return {
         'temperature': _celsius_to_fahrenheit(current['temperature']['value']),
         'description': current['textDescription'],
         'icon': _normalize_icon(_extract_icon(current['icon'])),
     }
 
-    cleaned_forecast = {
+
+def fetch_forecasts() -> Dict:
+    forecasts = _request_forecasts(FORECAST_OFFICE_ID, FORECAST_GRIDPOINT)
+    return {
         'today': _extract_cleaned_forecast(0, forecasts),
         'plus_one': _extract_cleaned_forecast(1, forecasts),
         'plus_two': _extract_cleaned_forecast(2, forecasts),
         'plus_three': _extract_cleaned_forecast(3, forecasts),
-    }
-    logging.debug('_nws_data:end')
-    return cleaned_current, cleaned_forecast
-
-
-def fetch():
-    current, forecast = _nws_data()
-    return {
-        'current': current,
-        'forecast': forecast
     }
