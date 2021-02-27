@@ -4,6 +4,7 @@ import datetime
 import json
 import logging
 import re
+from typing import Dict
 from urllib.request import Request, urlopen
 
 from .util import local_file
@@ -61,7 +62,7 @@ ICON_MAP = {
 }
 
 
-def _celsius_to_fahrenheit(degrees):
+def _celsius_to_fahrenheit(degrees) -> int:
     """
     >>> _celsius_to_fahrenheit(0)
     32
@@ -73,14 +74,14 @@ def _celsius_to_fahrenheit(degrees):
     return int(round((float(degrees) * 9/5) + 32))
 
 
-def _extract_datetime(time_string):
+def _extract_datetime(time_string: str) -> datetime.datetime:
     # time_string: 2019-02-16T18:00:00-08:00
     if ":" == time_string[-3:-2]:  # Remove the colon from the timezone data
         time_string = time_string[:-3] + time_string[-2:]
     return datetime.datetime.strptime(time_string, '%Y-%m-%dT%H:%M:%S%z')  # 2019-02-16T18:00:00-0800
 
 
-def _populate_date(entry, forecast, prefer_desc_icon=False):
+def _populate_date(entry: Dict, forecast: Dict, prefer_desc_icon=False) -> None:
     if entry['low'] is None or forecast['temperature'] < entry['low']:
         entry['low'] = forecast['temperature']
     if entry['high'] is None or forecast['temperature'] > entry['high']:
@@ -91,7 +92,7 @@ def _populate_date(entry, forecast, prefer_desc_icon=False):
         entry['icon'] = forecast['icon']
 
 
-def _coalesce_forecasts(forecasts):
+def _coalesce_forecasts(forecasts: Dict) -> Dict:
     '''
         NWS returns forecasts in half-day increments.
         This coalesces those increments into whole-day values that the rest of the code expects.
@@ -150,7 +151,7 @@ def _request_data(station_id, office_id, gridpoint):
     return conditions_parsed_json['properties'], forecasts
 
 
-def _extract_cleaned_forecast(day_idx, forecasts):
+def _extract_cleaned_forecast(day_idx: int, forecasts: Dict) -> Dict:
     return {
         'low-temperature': forecasts[day_idx]['low'],
         'high-temperature': forecasts[day_idx]['high'],
@@ -160,7 +161,7 @@ def _extract_cleaned_forecast(day_idx, forecasts):
     }
 
 
-def _extract_icon(raw_icon):
+def _extract_icon(raw_icon: str) -> str:
     icon = None
     icon_match = ICON_EXTRACTOR.match(raw_icon)
     if icon_match:
@@ -168,7 +169,7 @@ def _extract_icon(raw_icon):
     return icon
 
 
-def _normalize_icon(nws_icon):
+def _normalize_icon(nws_icon: str) -> str:
     try:
         return ICON_MAP[nws_icon] if nws_icon is not None else 'unknown'
     except KeyError:

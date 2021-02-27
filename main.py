@@ -45,7 +45,7 @@ def _dst_start_end(tz_aware_when):
     return dst_start_local, dst_end_local
 
 
-def fetch_calendar(context, days):
+def fetch_calendar(context, days) -> None:
     logging.debug('fetch_calendar:start')
     try:
         if MOCK_CALENDAR:
@@ -67,7 +67,7 @@ def fetch_calendar(context, days):
     logging.debug('fetch_calendar:end')
 
 
-def fetch_weather(context, days):
+def fetch_weather(context, days) -> None:
     logging.debug('fetch_weather:start')
     try:
         if MOCK_WEATHER:
@@ -87,7 +87,7 @@ def fetch_weather(context, days):
     logging.debug('fetch_weather:end')
 
 
-def fetch_special_events(context, days):
+def fetch_special_events(context, days) -> None:
     logging.debug('fetch_special_events:start')
     try:
         if MOCK_SPECIAL_EVENTS:
@@ -117,7 +117,7 @@ def fetch_special_events(context, days):
     logging.debug('fetch_special_events:end')
 
 
-def fetch_daylight_saving_time(context, days):
+def fetch_daylight_saving_time(context, days) -> None:
     logging.debug('fetch_daylight_saving_time:start')
     try:
         dst_start_local, dst_end_local = _dst_start_end(context['now'])
