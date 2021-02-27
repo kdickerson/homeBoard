@@ -148,32 +148,39 @@ def _draw_forecast_and_current(image, draw, conditions, forecast, header_font, t
     SUB_COLUMN_WIDTH = COLUMN_WIDTH // 2
 
     # Sub column 1:
-    _draw_centered_text(
-        draw,
-        (0, WEATHER_TEMP_TOP),
-        SUB_COLUMN_WIDTH,
-        str(conditions['temperature']) + '°',
-        temp_font,
-        color=RED,
-        measure_text=str(conditions['temperature'])
-    )
+    if conditions:
+        _draw_centered_text(
+            draw,
+            (0, WEATHER_TEMP_TOP),
+            SUB_COLUMN_WIDTH,
+            str(conditions['temperature']) + '°',
+            temp_font,
+            color=RED,
+            measure_text=str(conditions['temperature'])
+        )
+        try:
+            cur_icon = _load_weather_icon(conditions['icon']).point(BLACK_TO_RED_LUT)
+            image.paste(cur_icon, ((SUB_COLUMN_WIDTH - cur_icon.size[0]) // 2, WEATHER_ICON_TOP))
+        except Exception:
+            cur_icon = None
 
     # Sub column 2:
-    _draw_centered_text(
-        draw,
-        (SUB_COLUMN_WIDTH, WEATHER_TEMP_TOP),
-        SUB_COLUMN_WIDTH,
-        str(forecast['high-temperature']) + '°',
-        temp_font,
-        measure_text=str(forecast['high-temperature'])
-    )
+    if forecast:
+        _draw_centered_text(
+            draw,
+            (SUB_COLUMN_WIDTH, WEATHER_TEMP_TOP),
+            SUB_COLUMN_WIDTH,
+            str(forecast['high-temperature']) + '°',
+            temp_font,
+            measure_text=str(forecast['high-temperature'])
+        )
+        try:
+            forecast_icon = _load_weather_icon(forecast['icon'])
+            image.paste(forecast_icon, ((SUB_COLUMN_WIDTH - cur_icon.size[0]) // 2 + SUB_COLUMN_WIDTH, WEATHER_ICON_TOP))
+        except Exception:
+            forecast_icon = None
 
-    try:
-        cur_icon = _load_weather_icon(conditions['icon']).point(BLACK_TO_RED_LUT)
-        forecast_icon = _load_weather_icon(forecast['icon'])
-        image.paste(cur_icon, ((SUB_COLUMN_WIDTH - cur_icon.size[0]) // 2, WEATHER_ICON_TOP))
-        image.paste(forecast_icon, ((SUB_COLUMN_WIDTH - cur_icon.size[0]) // 2 + SUB_COLUMN_WIDTH, WEATHER_ICON_TOP))
-    except:  # noqa: E722
+    if not cur_icon and not forecast_icon and conditions:
         _draw_centered_text(draw, (0, WEATHER_ICON_TOP), COLUMN_WIDTH, conditions['description'], temp_font)
     logging.debug('_draw_forecast_and_current:end')
 
@@ -269,7 +276,7 @@ def create(context):
     # 1st Column
     left = COLUMNS[0]
     _draw_header(draw, (left, HEADER_TOP), context['today']['date'].strftime('%b %-d'), fonts['header'], RED)
-    if context['today']['conditions'] and context['today']['forecast']:
+    if context['today']['conditions'] or context['today']['forecast']:
         _draw_forecast_and_current(
             image,
             draw,

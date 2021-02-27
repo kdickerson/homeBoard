@@ -72,16 +72,25 @@ def fetch_weather(context, days) -> None:
     try:
         if MOCK_WEATHER:
             with open(util.local_file(MOCK_WEATHER_FILE), 'rb') as mock_data:
-                conditions = pickle.load(mock_data)
+                weather_data = pickle.load(mock_data)
         else:
-            conditions = weather.fetch()  # weather can only fetch conditions and forecast for "now"
+            weather_data = {'current': None, 'forecast': None}
+            try:
+                weather_data['current'] = weather.fetch_current_conditions()
+            except Exception:
+                logging.exception('Exception while fetching Weather conditions.')
+            try:
+                weather_data['forecast'] = weather.fetch_forecasts()
+            except Exception:
+                logging.exception('Exception while fetching Weather forecasts.')
             if SAVE_MOCK:
                 with open(util.local_file(MOCK_WEATHER_FILE), 'wb') as mock_data:
-                    pickle.dump(conditions, mock_data)
-        context['today']['conditions'] = conditions['current']
-        for day in days:
-            context[day]['forecast'] = conditions['forecast'][day]
-        context['success']['weather'] = True
+                    pickle.dump(weather_data, mock_data)
+        context['today']['conditions'] = weather_data['current']
+        if weather_data['forecast']:
+            for day in days:
+                context[day]['forecast'] = weather_data['forecast'][day]
+        context['success']['weather'] = bool(weather_data['current'] and weather_data['forecast'])
     except Exception:
         logging.exception('Exception while fetching Weather')
     logging.debug('fetch_weather:end')
