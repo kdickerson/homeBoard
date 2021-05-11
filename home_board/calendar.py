@@ -48,6 +48,7 @@ CALENDARS = [
     {'id': 'gdh9plpc638531bfj3epe7gal8@group.calendar.google.com', 'label': 'LLNL'},
     {'id': '9ffkmhpu4c6tlg0sb52v1gvkmo@group.calendar.google.com', 'label': 'Rancho'},
     {'id': 'pd8j83mj5r8n5abdgil181ook8@group.calendar.google.com', 'label': 'Vacation'},
+    {'id': 'family06978490388031311204@group.calendar.google.com', 'label': 'Family'},
     {'id': 'en.usa#holiday@group.v.calendar.google.com', 'label': 'Holidays'}
 ]
 
