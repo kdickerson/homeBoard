@@ -1,17 +1,21 @@
 # Home Board
 
-A set of scripts to load "agenda" data and display it on a [Waveshare ePaper display (7.5 inch, 3 color)](https://www.waveshare.com/product/7.5inch-e-paper-hat-b.htm) - Powered by a Raspberry Pi.
+A set of scripts to load "agenda" data and display it on a [Waveshare ePaper display (7.5 inch, 3 color)](https://www.waveshare.com/product/7.5inch-e-paper-hat-b.htm) -
+Powered by a Raspberry Pi (in my case, a Raspberry Pi Model B Rev 2).
 
-Written for Python3 (tested on 3.5), utilizes pipenv.
+Written for Python3 (tested on 3.7), utilizes pipenv.
 
 Pulls weather conditions and forecasting from the [National Weather Service](https://www.weather.gov/documentation/services-web-api) (NO API Key required).
 
 Pulls Calendering information from [Google Calendar](https://developers.google.com/google-apps/calendar/) (OAuth2 authentication required).
 
 After configuring weather and calendaring APIs:
+You may need to install `libpython3.7-dev` to build the `rpi-gpio` package.
 
+    > python3.7 -m pip install --user --upgrade pip
+    > python3.7 -m pip install --user --upgrade pipenv
     > pipenv install
-    > pipenv run python main
+    > pipenv run python main.py
 
 Note: As far as I can tell, you need to generate the OAuth2 credentials on the device that will run homeBoard.  You can generate them elsewhere and then copy them to the device, but for me they wouldn't refresh as the device was unknown to Google.  Once I generated on the device they were able to automatically refresh.
 
