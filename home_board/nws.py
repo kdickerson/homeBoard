@@ -13,7 +13,7 @@ from .util import local_file
 CONDITIONS_STATION_ID = 'KLVK'  # NWS Station ID to get latest observation
 # Obtain forecast officeID and gridpoint using GPS coordinates: https://api.weather.gov/points/37.6908,-121.787
 FORECAST_OFFICE_ID = 'MTR'
-FORECAST_GRIDPOINT = '109,118'
+FORECAST_GRIDPOINT = '106,97'
 CONDITIONS_URL = 'https://api.weather.gov/stations/{station_id}/observations/latest?require_qc=false'
 FORECAST_URL = 'https://api.weather.gov/gridpoints/{office_id}/{gridpoint}/forecast'
 MOCK_NWS_DATA = False
