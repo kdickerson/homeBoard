@@ -127,6 +127,8 @@ def _calendar_data(tz_aware_when_start, tz_aware_when_end, calendar, timezone):
     events = _request_data(tz_aware_when_start, tz_aware_when_end, calendar, timezone)
     cleaned_events = []
     for event in events:
+        if event.get('visibility') == 'private':
+            continue
         cleaned_events.append({
             'calendar_label': calendar['label'],
             'start': event['parsed_start'],
