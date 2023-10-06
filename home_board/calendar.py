@@ -50,7 +50,8 @@ CALENDARS = [
     {'id': '9ffkmhpu4c6tlg0sb52v1gvkmo@group.calendar.google.com', 'label': 'Rancho'},
     {'id': 'pd8j83mj5r8n5abdgil181ook8@group.calendar.google.com', 'label': 'Vacation'},
     {'id': 'family06978490388031311204@group.calendar.google.com', 'label': 'Family'},
-    {'id': 'en.usa#holiday@group.v.calendar.google.com', 'label': 'Holidays'}
+    {'id': 'en.usa#holiday@group.v.calendar.google.com', 'label': 'Holidays'},
+    {'id': '848c39f5cdc827c5eac390790386bef1123df6750dc8775c3c849ccefef13a52@group.calendar.google.com', 'label': 'LVJUSD'}
 ]
 
 
