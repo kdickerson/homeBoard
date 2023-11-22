@@ -146,6 +146,8 @@ def _draw_forecast_and_current(image, draw, conditions, forecast, header_font, t
     logging.debug('current: ' + str(conditions))
     logging.debug('forecast: ' + str(forecast))
     SUB_COLUMN_WIDTH = COLUMN_WIDTH // 2
+    cur_icon = None
+    forecast_icon = None
 
     # Sub column 1:
     if conditions:
