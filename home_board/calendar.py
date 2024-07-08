@@ -24,21 +24,6 @@ MOCK_GOOGLE_CALENDAR_DATA_FILE = 'mock_data/mock_google_calendar_data.json'
 #       Need to figure that out and implement a cleanup strategy so old entries get culled
 HTTPLIB2_CACHE_DIR = None  # '/ram-tmp/httplib2_cache'
 
-
-class MemoryCache(Cache):
-    '''
-        For Google's Discovery service, which is suddenly really slow and
-            I need to stop hitting it for every calendar request
-    '''
-    _CACHE = {}
-
-    def get(self, url):
-        return MemoryCache._CACHE.get(url)
-
-    def set(self, url, content):
-        MemoryCache._CACHE[url] = content
-
-
 # See list_calendars() to get a list of available IDs
 CALENDARS = [
     {'id': 'kyle.dickerson@gmail.com', 'label': 'Kyle'},
@@ -53,6 +38,20 @@ CALENDARS = [
     {'id': 'en.usa#holiday@group.v.calendar.google.com', 'label': 'Holidays'},
     {'id': '848c39f5cdc827c5eac390790386bef1123df6750dc8775c3c849ccefef13a52@group.calendar.google.com', 'label': 'LVJUSD'}
 ]
+
+
+class MemoryCache(Cache):
+    '''
+        For Google's Discovery service, which is suddenly really slow and
+            I need to stop hitting it for every calendar request
+    '''
+    _CACHE = {}
+
+    def get(self, url):
+        return MemoryCache._CACHE.get(url)
+
+    def set(self, url, content):
+        MemoryCache._CACHE[url] = content
 
 
 def _get_credentials_store():
