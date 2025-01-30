@@ -3,25 +3,39 @@
 A set of scripts to load "agenda" data and display it on a [Waveshare ePaper display (7.5 inch, 3 color)](https://www.waveshare.com/product/7.5inch-e-paper-hat-b.htm) -
 Powered by a Raspberry Pi (in my case, a Raspberry Pi Model B Rev 2).
 
-Written for Python3 (tested on 3.7), utilizes pipenv.
+Written for Python3 (tested on 3.9).
+
+## Setup
+
+1. After installing the RPi image, use the RPi config gui or `raspi-config` command to enable SPI (under "Interfaces").
+2. Install python3.9 and libpython3.9-dev: `sudo apt install python3.9 libpython3.9-dev`.
+3. Create virtual environment: `cd homeBoard && python -m venv .venv`
+4. Install/upgrade pip: `.venv/bin/python -m pip install --upgrade pip`.
+5. Install dependencies: `.venv/bin/python -m pip install -r rpi-requirements.txt`
+6. Configure Calendar and Weather by editing `home_board/calendar.py` and `home_board/nws.py`
+7. Place calendar credentials in `private/calendar-credentials.json`.
+    - E.g., `{"username": "kyle", "password": "app-token-or-password-here"}`
+8. Run application `.venv/bin/python main.py`
+
+### Development Setup
+
+Follow instructions above on any computer with the following changes:
+
+Step 5: Replace `rpi-requirements.txt` with `dev-requirements.txt`.
+
+Step 8: Save image to file instead of attempting to transmit to display: `.venv/bin/python main.py save`.
+
+## Details
 
 Pulls weather conditions and forecasting from the [National Weather Service](https://www.weather.gov/documentation/services-web-api) (NO API Key required).
 
-Pulls Calendering information from [Google Calendar](https://developers.google.com/google-apps/calendar/) (OAuth2 authentication required).
+Pulls Calendering information from any CalDAV server.
 
 After configuring weather and calendaring APIs:
-You may need to install `libpython3.7-dev` to build the `rpi-gpio` package.
-
-    > python3.7 -m pip install --user --upgrade pip
-    > python3.7 -m pip install --user --upgrade pipenv
-    > pipenv install
-    > pipenv run python main.py
-
-Note: As far as I can tell, you need to generate the OAuth2 credentials on the device that will run homeBoard.  You can generate them elsewhere and then copy them to the device, but for me they wouldn't refresh as the device was unknown to Google.  Once I generated on the device they were able to automatically refresh.
 
 Pulls Special Events from a locally-defined Dict.
 
-Determines Daylight Saving Time changes from the defined timezone using pytz.
+Determines Daylight Saving Time changes from the defined timezone using pytz. (Can do this, currently disabled.)
 
 Has functionality for using mock data at 2 levels:
  - High-level responses from data modules (useful for mocking specific displays)
@@ -51,13 +65,13 @@ Run DocTests:
 Example Crontab entries:
 
     > # Update every 15 minutes during the day
-    > */15 7-21 * * * /home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard
+    > */15 7-21 * * * /home/pi/homeBoard/.venv/bin/python /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard
     > # Only update once per hour overnight
-    > 0 22-23,0-6 * * * /home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard
+    > 0 22-23,0-6 * * * /home/pi/homeBoard/.venv/bin/python /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard
 
 Example Crontab entries using Flock to avoid simultaneous executions (which usually result in image corruption on the display):
 
     > # Update every 15 minutes during the day
-    > */15 7-21 * * * /usr/bin/flock -n /home/pi/homeBoard_cron.lock -c "/home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard"
+    > */15 7-21 * * * /usr/bin/flock -n /home/pi/homeBoard_cron.lock -c "/home/pi/homeBoard/.venv/bin/python /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard"
     > # Only update once per hour overnight
-    > 0 22-23,0-6 * * * /usr/bin/flock -n /home/pi/homeBoard_cron.lock -c "/home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard"
+    > 0 22-23,0-6 * * * /usr/bin/flock -n /home/pi/homeBoard_cron.lock -c "/home/pi/homeBoard/.venv/bin/python /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard"

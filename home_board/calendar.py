@@ -1,141 +1,77 @@
-# Fetch calendaring info from Google, process, and return
+# Fetch calendaring info from CalDav server, process, and return
 import datetime
 import json
 import logging
 
-import dateutil.parser
-import httplib2
+import caldav
 import pytz
-from apiclient import discovery
-from googleapiclient.discovery_cache.base import Cache
-from oauth2client import client, tools
-from oauth2client.file import Storage
 
 from .util import local_file
 
-# If modifying these scopes, delete your previously saved credentials
-SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
-CLIENT_SECRET_FILE = 'private/google_calendar.key'
-CREDENTIALS_FILE = 'private/google_calendar_credentials.key'
-APPLICATION_NAME = 'Google Calendar API Python Quickstart'
-MOCK_GOOGLE_CALENDAR_DATA = False
-MOCK_GOOGLE_CALENDAR_DATA_FILE = 'mock_data/mock_google_calendar_data.json'
-# TODO: URLs seem to be changing which negates the cache, but fills it up.
-#       Need to figure that out and implement a cleanup strategy so old entries get culled
-HTTPLIB2_CACHE_DIR = None  # '/ram-tmp/httplib2_cache'
-
-
-class MemoryCache(Cache):
-    '''
-        For Google's Discovery service, which is suddenly really slow and
-            I need to stop hitting it for every calendar request
-    '''
-    _CACHE = {}
-
-    def get(self, url):
-        return MemoryCache._CACHE.get(url)
-
-    def set(self, url, content):
-        MemoryCache._CACHE[url] = content
-
+CAL_DAV_URL = 'https://cloud.serindu.com/remote.php/dav/calendars/'
+CREDENTIALS_FILE = 'private/calendar-credentials.json'  # relative to project base
 
 # See list_calendars() to get a list of available IDs
 CALENDARS = [
-    {'id': 'kyle.dickerson@gmail.com', 'label': 'Kyle'},
-    {'id': 'dickersonjess@gmail.com', 'label': 'Jess'},
-    {'id': 'hj0q4jnosi4jm2mhpecd2b9564@group.calendar.google.com', 'label': 'Heather'},
-    {'id': 'jpsmb71hrr2fvqo3l9ffpo3ca8@group.calendar.google.com', 'label': 'Corinne'},
-    {'id': 'gdh9plpc638531bfj3epe7gal8@group.calendar.google.com', 'label': 'LLNL'},
-    {'id': '204bcb11409e180bc724a49d5ef1fcbe1973e230b495e9ec1cc7b4d80a0a8c2b@group.calendar.google.com', 'label': 'Junction'},
-    {'id': '9ffkmhpu4c6tlg0sb52v1gvkmo@group.calendar.google.com', 'label': 'Rancho'},
-    {'id': 'pd8j83mj5r8n5abdgil181ook8@group.calendar.google.com', 'label': 'Vacation'},
-    {'id': 'family06978490388031311204@group.calendar.google.com', 'label': 'Family'},
-    {'id': 'en.usa#holiday@group.v.calendar.google.com', 'label': 'Holidays'},
-    {'id': '848c39f5cdc827c5eac390790386bef1123df6750dc8775c3c849ccefef13a52@group.calendar.google.com', 'label': 'LVJUSD'}
+    {'id': 'personal', 'label': 'Kyle'},
+    {'id': 'personal_shared_by_jess', 'label': 'Jess'},
+    {'id': 'personal_shared_by_heather', 'label': 'Heather'},
+    {'id': 'personal_shared_by_corinne', 'label': 'Corinne'},
+    {'id': 'llnl-holidays', 'label': 'LLNL'},
+    {'id': 'junction-ave', 'label': 'Junction'},
+    {'id': 'rancho-las-positas', 'label': 'Rancho'},
+    {'id': 'family', 'label': 'Family'},
+    {'id': 'lvjusd', 'label': 'LVJUSD'}
 ]
 
 
-def _get_credentials_store():
-    logging.debug('_get_credentials_store')
-    credential_path = local_file(CREDENTIALS_FILE)
-    return Storage(credential_path)
-
-
 def _get_credentials():
-    """Gets valid user credentials from storage.
+    with open(local_file(CREDENTIALS_FILE)) as credentials_file:
+        return json.load(credentials_file)
 
-    If nothing has been stored, or if the stored credentials are invalid,
-    the OAuth2 flow is completed to obtain the new credentials.
-
-    Must be run in an environment with a browser available to authorize the access.
-
-    Returns:
-        Credentials, the obtained credential.
-    """
-    logging.debug('_get_credentials')
-    store = _get_credentials_store()
-    credentials = store.get()
-    if not credentials:
-        msg = "No valid credentials found.  \
-            Run generate_credentials manually to generate them.  \
-            Must be done manually with available local web browser the first time only."
-        raise ValueError(msg)
-    if credentials.invalid:
-        credentials = generate_credentials()
-    return credentials
 
 
 def _request_data(tz_aware_when_start, tz_aware_when_end, calendar, timezone):
     logging.debug('_request_data:start')
-    if MOCK_GOOGLE_CALENDAR_DATA:
-        with open(local_file(MOCK_GOOGLE_CALENDAR_DATA_FILE)) as mock_data:
-            eventsResult = json.load(mock_data)[calendar['id']]
-    else:
-        credentials = _get_credentials()
-        http = credentials.authorize(httplib2.Http(cache=HTTPLIB2_CACHE_DIR, timeout=60))
-        logging.debug('_request_data:discovery start')
-        service = discovery.build('calendar', 'v3', http=http, cache=MemoryCache())
-        logging.debug('_request_data:discovery end')
-        start = tz_aware_when_start.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(pytz.utc).isoformat()
-        end = tz_aware_when_end.replace(hour=23, minute=59, second=59, microsecond=999999).astimezone(pytz.utc).isoformat()  # noqa: E501
-        logging.debug('_request_data:request start')
-        eventsResult = service.events().list(
-            calendarId=calendar['id'],
-            timeMin=start,
-            timeMax=end,
-            singleEvents=True,
-            orderBy='startTime',
-            timeZone=timezone
-        ).execute()
-        logging.debug('_request_data:request end')
-
-    eventsResult['items'] = eventsResult.get('items', [])
-    for event in eventsResult['items']:
-        event['parsed_start'] = (
-            dateutil.parser.parse(event['start']['dateTime']) if 'dateTime' in event['start']
-            else timezone.localize(dateutil.parser.parse(event['start']['date']))
+    start = tz_aware_when_start.replace(hour=0, minute=0, second=0, microsecond=0).astimezone(pytz.utc)
+    end = tz_aware_when_end.replace(hour=23, minute=59, second=59, microsecond=999999).astimezone(pytz.utc)
+    creds = _get_credentials()
+    with caldav.DAVClient(url=CAL_DAV_URL, username=creds['username'], password=creds['password']) as client:
+        principal = client.principal()
+        calendar = principal.calendar(cal_id=calendar['id'])
+        events = calendar.search(
+            start=start,
+            end=end,
+            event=True,
+            expand=True,
+            sort_keys=['DTSTART'],
         )
-        event['parsed_end'] = (
-            dateutil.parser.parse(event['end']['dateTime']) if 'dateTime' in event['end']
-            else timezone.localize(dateutil.parser.parse(event['end']['date']))
-        )
-        event['all_day'] = 'date' in event['start']
     logging.debug('_request_data:end')
-    return eventsResult['items']
+    return events
+
+
+def _normalize_event_time(date_or_datetime, timezone):
+    '''Convert datetimes to timezone and convert dates to midnight in timezone'''
+    if isinstance(date_or_datetime, datetime.datetime):
+        return date_or_datetime.astimezone(timezone)
+    return timezone.localize(datetime.datetime(date_or_datetime.year, date_or_datetime.month, date_or_datetime.day))
 
 
 def _calendar_data(tz_aware_when_start, tz_aware_when_end, calendar, timezone):
     events = _request_data(tz_aware_when_start, tz_aware_when_end, calendar, timezone)
     cleaned_events = []
     for event in events:
-        if event.get('visibility') == 'private':
-            continue
+        # Can't check if is `date` because `datetime`s are `date`s
+        is_all_day = not isinstance(event.vobject_instance.vevent.dtstart.value, datetime.datetime)
+        start = _normalize_event_time(event.vobject_instance.vevent.dtstart.value, timezone)
+        end = _normalize_event_time(event.vobject_instance.vevent.dtend.value, timezone)
+
         cleaned_events.append({
             'calendar_label': calendar['label'],
-            'start': event['parsed_start'],
-            'end': event['parsed_end'],
-            'all_day': event['all_day'],
-            'description': event['summary'],
+            'start': start,
+            'end': end,
+            'all_day': is_all_day,
+            'description': event.vobject_instance.vevent.summary.value,
         })
     return cleaned_events
 
@@ -152,45 +88,45 @@ def _fetch_events(first_day, last_day, calendars, timezone):
 def _segment_events(tz_aware_when, today, plus_one, plus_two, plus_three, events):
     """
     >>> tz = pytz.timezone("America/Los_Angeles")
-    >>> tz_aware_when = dateutil.parser.parse("2018-12-01T18:32:45-08:00")
+    >>> tz_aware_when = tz.localize(datetime.datetime(2018, 12, 1, 18, 32, 45))
     >>> today = tz_aware_when.replace(hour=0, minute=0, second=0, microsecond=0)
     >>> plus_one = today + datetime.timedelta(days=1)
     >>> plus_two = plus_one + datetime.timedelta(days=1)
     >>> plus_three = plus_two + datetime.timedelta(days=1)
     >>> events = [
     ...     {
-    ...         'start': tz.localize(dateutil.parser.parse('2018-11-30')),
-    ...         'end': tz.localize(dateutil.parser.parse('2018-12-04')),
+    ...         'start': tz.localize(datetime.datetime(2018, 11, 30)),
+    ...         'end': tz.localize(datetime.datetime(2018, 12, 4)),
     ...         'description': 'Multi-day',
     ...         'all_day': True,
     ...     },
     ...     {
-    ...         'start': dateutil.parser.parse('2018-12-01T18:15:00-08:00'),
-    ...         'end': dateutil.parser.parse('2018-12-01T19:00:00-08:00'),
+    ...         'start': tz.localize(datetime.datetime(2018, 12, 1, 18, 15)),
+    ...         'end': tz.localize(datetime.datetime(2018, 12, 1, 19)),
     ...         'description': 'Happening Now',
     ...         'all_day': False,
     ...     },
     ...     {
-    ...         'start': dateutil.parser.parse('2018-12-01T20:00:00-08:00'),
-    ...         'end': dateutil.parser.parse('2018-12-01T20:30:00-08:00'),
+    ...         'start': tz.localize(datetime.datetime(2018, 12, 1, 20)),
+    ...         'end': tz.localize(datetime.datetime(2018, 12, 1, 20, 30)),
     ...         'description': 'Future still Today',
     ...         'all_day': False,
     ...     },
     ...     {
-    ...         'start': dateutil.parser.parse('2018-12-02T08:00:00-08:00'),
-    ...         'end': dateutil.parser.parse('2018-12-02T09:00:00-08:00'),
+    ...         'start': tz.localize(datetime.datetime(2018, 12, 2, 8)),
+    ...         'end': tz.localize(datetime.datetime(2018, 12, 2, 9)),
     ...         'description': 'Tomorrow',
     ...         'all_day': False,
     ...     },
     ...     {
-    ...         'start': tz.localize(dateutil.parser.parse('2018-12-03')),
-    ...         'end': tz.localize(dateutil.parser.parse('2018-12-06')),
+    ...         'start': tz.localize(datetime.datetime(2018, 12, 3)),
+    ...         'end': tz.localize(datetime.datetime(2018, 12, 6)),
     ...         'description': 'Future past the end',
     ...         'all_day': True,
     ...     },
     ...     {
-    ...         'start': dateutil.parser.parse('2018-12-01T08:00:00-08:00'),
-    ...         'end': dateutil.parser.parse('2018-12-01T11:00:00-08:00'),
+    ...         'start': tz.localize(datetime.datetime(2018, 12, 1, 8)),
+    ...         'end': tz.localize(datetime.datetime(2018, 12, 1, 11)),
     ...         'description': 'Already Over',
     ...         'all_day': False,
     ...     },
@@ -247,29 +183,17 @@ def fetch(tz_aware_when):
     return _segment_events(tz_aware_when, today, plus_one, plus_two, plus_three, fetched_events)
 
 
-def generate_credentials():
-    '''Requires web browser available to handle authorization flow'''
-    logging.debug('generate_credentials')
-    store = _get_credentials_store()
-    credentials = store.get()
-    if not credentials or credentials.invalid:
-        flow = client.flow_from_clientsecrets(local_file(CLIENT_SECRET_FILE), SCOPES)
-        flow.user_agent = APPLICATION_NAME
-        credentials = tools.run_flow(flow, store)
-    return credentials
-
-
 def list_calendars():
     logging.debug('list_calendars')
-    credentials = _get_credentials()
-    http = credentials.authorize(httplib2.Http())
-    service = discovery.build('calendar', 'v3', http=http)
-    calendar_list = service.calendarList().list().execute()
+    creds = _get_credentials()
+    with caldav.DAVClient(url=CAL_DAV_URL, username=creds['username'], password=creds['password']) as client:
+        principal = client.principal()
+        calendars = principal.calendars()
+
     cleaned_calendars = []
-    for item in calendar_list.get('items', []):
+    for cal in calendars:
         cleaned_calendars.append({
-            'id': item['id'],
-            'summary': item.get('summaryOverride', item['summary']),
-            'description': item.get('description', ''),
+            'id': cal.id,
+            'name': cal.name,
         })
     return cleaned_calendars

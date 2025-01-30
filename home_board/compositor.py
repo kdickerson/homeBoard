@@ -67,18 +67,18 @@ def _load_event_icon(icon):
 
 
 def _draw_centered_text(draw, offset, width, text, font, color=BLACK, measure_text=None):
-    dimensions = draw.textsize(measure_text if measure_text else text, font=font)
-    loc = ((width - dimensions[0]) // 2 + offset[0], offset[1])
+    text_width = draw.textlength(measure_text if measure_text else text, font=font)
+    loc = ((width - text_width) // 2 + offset[0], offset[1])
     draw.text(loc, text, font=font, fill=color)
 
 
 def _truncate_text(draw, text, font, width):
-    dimensions = draw.textsize(text, font=font)
+    text_width = draw.textlength(text, font=font)
     i = 0
-    while dimensions[0] > width:
+    while text_width > width:
         i = i - 1
-        dimensions = draw.textsize(text[:i], font=font)
-    return (text[:i-1] + '…') if i < 0 else text, dimensions
+        text_width = draw.textlength(text[:i], font=font)
+    return (text[:i-1] + '…') if i < 0 else text, (text_width, font.size)
 
 
 def _draw_header(draw, offset, text, font, color=BLACK):
@@ -92,7 +92,7 @@ def _draw_calendar(image, draw, events, offset, bottom, cal_header_font, descrip
     right_margin = 5
     bottom_margin = 5
     top = offset[1]
-    more_msg_height = draw.textsize('+123456789 More', font=description_font)[1]  # Max height for "+X More" msg
+    more_msg_height = description_font.size
     for idx, event in enumerate(events):
         header_txt = ''
         # Make sure we don't show start times for events that started a previous date,
@@ -178,7 +178,8 @@ def _draw_forecast_and_current(image, draw, conditions, forecast, header_font, t
         )
         try:
             forecast_icon = _load_weather_icon(forecast['icon'])
-            image.paste(forecast_icon, ((SUB_COLUMN_WIDTH - cur_icon.size[0]) // 2 + SUB_COLUMN_WIDTH, WEATHER_ICON_TOP))
+            image.paste(forecast_icon,
+                        ((SUB_COLUMN_WIDTH - cur_icon.size[0]) // 2 + SUB_COLUMN_WIDTH, WEATHER_ICON_TOP))
         except Exception:
             forecast_icon = None
 
@@ -202,7 +203,8 @@ def _draw_forecast(image, draw, column_left, forecast, header_font, temp_font):
 
 def _draw_special_event(image, draw, event, footer_offset, font):
     logging.debug('_draw_special_event:start')
-    textsize = draw.textsize(event['msg'], font=font)
+    width = draw.textlength(event['msg'], font=font)
+    height = font.size
     iconsize = (0, 0)
     icon = None
     try:
@@ -214,16 +216,16 @@ def _draw_special_event(image, draw, event, footer_offset, font):
 
     if icon:
         padding = 5
-        msgsize = (iconsize[0] + textsize[0] + padding, max(textsize[1], iconsize[1]))
+        msgsize = (iconsize[0] + width + padding, max(height, iconsize[1]))
     else:
         padding = 0
-        msgsize = textsize
+        msgsize = (width, height)
 
     icon_left = (EPD_WIDTH - msgsize[0]) // 2
     icon_top = footer_offset[1] - msgsize[1]
     icon_offset = (icon_left, icon_top + (msgsize[1] - iconsize[1]) // 2)
-    text_offset = (icon_left + iconsize[0] + padding, icon_top + (msgsize[1] - textsize[1]) // 2)
-    text_to_footer_gap = footer_offset[1] - (text_offset[1] + textsize[1])
+    text_offset = (icon_left + iconsize[0] + padding, icon_top + (msgsize[1] - height) // 2)
+    text_to_footer_gap = footer_offset[1] - (text_offset[1] + height)
     if text_to_footer_gap > 0:
         icon_offset = (icon_offset[0], icon_offset[1] + text_to_footer_gap)
         text_offset = (text_offset[0], text_offset[1] + text_to_footer_gap)
@@ -235,11 +237,12 @@ def _draw_special_event(image, draw, event, footer_offset, font):
 
 def _draw_footer(image, draw, text, font):
     logging.debug('_draw_footer:start')
-    dimensions = draw.textsize(text, font=font)
-    offset = (EPD_WIDTH-dimensions[0], EPD_HEIGHT-dimensions[1])
+    width = draw.textlength(text, font=font)
+    height = font.size
+    offset = (EPD_WIDTH-width, EPD_HEIGHT-height)
     draw.text(offset, text, font=font, fill=BLACK)
     logging.debug('_draw_footer:end')
-    return offset, dimensions
+    return offset, (width, height)
 
 
 def create(context):
