@@ -23,48 +23,48 @@ EVENTS = [
     {'month': 10, 'day': 31, 'msg': 'Happy Halloween!', 'icon': 'halloween'},
     {'month': 12, 'day': 25, 'msg': 'Merry Christmas!', 'icon': 'christmas'},
     # Thanksgiving Dates:
-    {'year': 2019, 'month': 11, 'day': 28, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
-    {'year': 2020, 'month': 11, 'day': 26, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
-    {'year': 2021, 'month': 11, 'day': 25, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
-    {'year': 2022, 'month': 11, 'day': 24, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
-    {'year': 2023, 'month': 11, 'day': 23, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
-    {'year': 2024, 'month': 11, 'day': 28, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
     {'year': 2025, 'month': 11, 'day': 27, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
-    # Seasons 2019:
-    {'year': 2019, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
-    {'year': 2019, 'month': 6, 'day': 21, 'header': 'Season', 'title': 'Summer'},
-    {'year': 2019, 'month': 9, 'day': 23, 'header': 'Season', 'title': 'Fall'},
-    {'year': 2019, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
-    # Seasons 2020:
-    {'year': 2020, 'month': 3, 'day': 19, 'header': 'Season', 'title': 'Spring'},
-    {'year': 2020, 'month': 6, 'day': 21, 'header': 'Season', 'title': 'Summer'},
-    {'year': 2020, 'month': 9, 'day': 23, 'header': 'Season', 'title': 'Fall'},
-    {'year': 2020, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
-    # Seasons 2021:
-    {'year': 2021, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
-    {'year': 2021, 'month': 6, 'day': 20, 'header': 'Season', 'title': 'Summer'},
-    {'year': 2021, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
-    {'year': 2021, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
-    # Seasons 2022:
-    {'year': 2022, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
-    {'year': 2022, 'month': 6, 'day': 21, 'header': 'Season', 'title': 'Summer'},
-    {'year': 2022, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
-    {'year': 2022, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
-    # Seasons 2023:
-    {'year': 2023, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
-    {'year': 2023, 'month': 6, 'day': 21, 'header': 'Season', 'title': 'Summer'},
-    {'year': 2023, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
-    {'year': 2023, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
-    # Seasons 2024:
-    {'year': 2024, 'month': 3, 'day': 19, 'header': 'Season', 'title': 'Spring'},
-    {'year': 2024, 'month': 6, 'day': 20, 'header': 'Season', 'title': 'Summer'},
-    {'year': 2024, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
-    {'year': 2024, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+    {'year': 2026, 'month': 11, 'day': 26, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
+    {'year': 2027, 'month': 11, 'day': 25, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
+    {'year': 2028, 'month': 11, 'day': 23, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
+    {'year': 2029, 'month': 11, 'day': 22, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
+    {'year': 2030, 'month': 11, 'day': 28, 'msg': 'Happy Thanksgiving!', 'icon': 'thanksgiving'},
+    
     # Seasons 2025:
     {'year': 2025, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
     {'year': 2025, 'month': 6, 'day': 20, 'header': 'Season', 'title': 'Summer'},
     {'year': 2025, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
     {'year': 2025, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+
+    # Seasons 2026:
+    {'year': 2026, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
+    {'year': 2026, 'month': 6, 'day': 21, 'header': 'Season', 'title': 'Summer'},
+    {'year': 2026, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
+    {'year': 2026, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+
+    # Seasons 2027:
+    {'year': 2027, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
+    {'year': 2027, 'month': 6, 'day': 21, 'header': 'Season', 'title': 'Summer'},
+    {'year': 2027, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
+    {'year': 2027, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+
+    # Seasons 2028:
+    {'year': 2028, 'month': 3, 'day': 19, 'header': 'Season', 'title': 'Spring'},
+    {'year': 2028, 'month': 6, 'day': 20, 'header': 'Season', 'title': 'Summer'},
+    {'year': 2028, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
+    {'year': 2028, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+
+    # Seasons 2029:
+    {'year': 2029, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
+    {'year': 2029, 'month': 6, 'day': 20, 'header': 'Season', 'title': 'Summer'},
+    {'year': 2029, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
+    {'year': 2029, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
+
+    # Seasons 2030:
+    {'year': 2030, 'month': 3, 'day': 20, 'header': 'Season', 'title': 'Spring'},
+    {'year': 2030, 'month': 6, 'day': 21, 'header': 'Season', 'title': 'Summer'},
+    {'year': 2030, 'month': 9, 'day': 22, 'header': 'Season', 'title': 'Fall'},
+    {'year': 2030, 'month': 12, 'day': 21, 'header': 'Season', 'title': 'Winter'},
 
     # Family Events
     {'month': 3, 'day': 17, 'header': 'Birthday', 'title': 'Corinne', 'msg': 'Happy Birthday, Corinne!', 'icon': 'birthday'},  # noqa: E501
