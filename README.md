@@ -3,19 +3,27 @@
 A set of scripts to load "agenda" data and display it on a [Waveshare ePaper display (7.5 inch, 3 color)](https://www.waveshare.com/product/7.5inch-e-paper-hat-b.htm) -
 Powered by a Raspberry Pi (in my case, a Raspberry Pi Model B Rev 2).
 
-Written for Python3 (tested on 3.9), utilizes pipenv.
+Written for Python3 (tested on 3.9).
 
 ## Setup
 
-2. After installing the RPi image, use the RPi config gui or `raspi-config` command to enable SPI (under "Interfaces").
-3. Install python3.9 and libpython3.9-dev: `sudo apt install python3.9 libpython3.9-dev`.
-4. Install/upgrade pip: `python3.9 -m pip install --user --upgrade pip`.
-5. Install pipenv: `python3.9 -m pip install --user --upgrade pipenv`.
-6. Install application dependencies via pipenv: `cd homeBoard && pipenv install`.
-7. Configure Calendar and Weather by editing `home_board/calendar.py` and `home_board/nws.py`
-8. Place calendar credentials in `private/calendar-credentials.json`.
+1. After installing the RPi image, use the RPi config gui or `raspi-config` command to enable SPI (under "Interfaces").
+2. Install python3.9 and libpython3.9-dev: `sudo apt install python3.9 libpython3.9-dev`.
+3. Create virtual environment: `cd homeBoard && python -m venv .venv`
+4. Install/upgrade pip: `.venv/bin/python -m pip install --upgrade pip`.
+5. Install dependencies: `.venv/bin/python -m pip install -r rpi-requirements.txt`
+6. Configure Calendar and Weather by editing `home_board/calendar.py` and `home_board/nws.py`
+7. Place calendar credentials in `private/calendar-credentials.json`.
     - E.g., `{"username": "kyle", "password": "app-token-or-password-here"}`
-9. Run application: `pipenv run python main.py`
+8. Run application `.venv/bin/python main.py`
+
+### Development Setup
+
+Follow instructions above on any computer with the following changes:
+
+Step 5: Replace `rpi-requirements.txt` with `dev-requirements.txt`.
+
+Step 8: Save image to file instead of attempting to transmit to display: `.venv/bin/python main.py save`.
 
 ## Details
 
@@ -57,13 +65,13 @@ Run DocTests:
 Example Crontab entries:
 
     > # Update every 15 minutes during the day
-    > */15 7-21 * * * /home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard
+    > */15 7-21 * * * /home/pi/homeBoard/.venv/bin/python /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard
     > # Only update once per hour overnight
-    > 0 22-23,0-6 * * * /home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard
+    > 0 22-23,0-6 * * * /home/pi/homeBoard/.venv/bin/python /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard
 
 Example Crontab entries using Flock to avoid simultaneous executions (which usually result in image corruption on the display):
 
     > # Update every 15 minutes during the day
-    > */15 7-21 * * * /usr/bin/flock -n /home/pi/homeBoard_cron.lock -c "/home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard"
+    > */15 7-21 * * * /usr/bin/flock -n /home/pi/homeBoard_cron.lock -c "/home/pi/homeBoard/.venv/bin/python /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard"
     > # Only update once per hour overnight
-    > 0 22-23,0-6 * * * /usr/bin/flock -n /home/pi/homeBoard_cron.lock -c "/home/pi/.local/share/virtualenvs/homeBoard--Ftpympu/bin/python3 /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard"
+    > 0 22-23,0-6 * * * /usr/bin/flock -n /home/pi/homeBoard_cron.lock -c "/home/pi/homeBoard/.venv/bin/python /home/pi/homeBoard/main.py 2>&1 | /usr/bin/logger -t homeBoard"
