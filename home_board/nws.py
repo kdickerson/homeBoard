@@ -5,7 +5,6 @@ import json
 import logging
 import re
 from typing import Dict
-from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 from .util import local_file
