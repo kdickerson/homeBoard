@@ -223,9 +223,9 @@ def _draw_special_event(image, draw, event, footer_offset, font):
 
     icon_left = (EPD_WIDTH - msgsize[0]) // 2
     icon_top = footer_offset[1] - msgsize[1]
-    icon_offset = (icon_left, icon_top + (msgsize[1] - iconsize[1]) // 2)
-    text_offset = (icon_left + iconsize[0] + padding, icon_top + (msgsize[1] - height) // 2)
-    text_to_footer_gap = footer_offset[1] - (text_offset[1] + height)
+    icon_offset = (round(icon_left), round(icon_top + (msgsize[1] - iconsize[1]) // 2))
+    text_offset = (round(icon_left + iconsize[0] + padding), round(icon_top + (msgsize[1] - height) // 2))
+    text_to_footer_gap = round(footer_offset[1] - (text_offset[1] + height))
     if text_to_footer_gap > 0:
         icon_offset = (icon_offset[0], icon_offset[1] + text_to_footer_gap)
         text_offset = (text_offset[0], text_offset[1] + text_to_footer_gap)
