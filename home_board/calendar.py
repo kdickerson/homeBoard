@@ -65,6 +65,10 @@ def _calendar_data(tz_aware_when_start, tz_aware_when_end, calendar, timezone):
         is_all_day = not isinstance(event.vobject_instance.vevent.dtstart.value, datetime.datetime)
         start = _normalize_event_time(event.vobject_instance.vevent.dtstart.value, timezone)
         end = _normalize_event_time(event.vobject_instance.vevent.dtend.value, timezone)
+        if is_all_day and start > tz_aware_when_end:
+            # All-day events get pulled in early since their start-time is not tz fixed during the query.
+            # So detect them here and drop them.
+            continue
 
         cleaned_events.append({
             'calendar_label': calendar['label'],
