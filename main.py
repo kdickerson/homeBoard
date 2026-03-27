@@ -172,7 +172,7 @@ def fetch_data():
                     entry = context[day]
                     cache_entry = cache[day]
                     if not context['success']['calendar'] and cache_entry['events']:
-                        deep_defaults(entry['events'], cache_entry['events'])
+                        entry['events'] = cache_entry['events']
                     if not context['success']['weather']:
                         if cache_entry['conditions']:
                             deep_defaults(entry['conditions'], cache_entry['conditions'])
