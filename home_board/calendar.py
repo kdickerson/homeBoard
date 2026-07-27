@@ -19,7 +19,7 @@ CALENDARS = [
     {'id': 'personal_shared_by_corinne', 'label': 'Corinne'},
     {'id': 'llnl-holidays', 'label': 'LLNL'},
     {'id': 'junction-ave', 'label': 'Junction'},
-    {'id': 'rancho-las-positas', 'label': 'Rancho'},
+    {'id': 'lhs', 'label': 'LHS'},
     {'id': 'family', 'label': 'Family'},
     {'id': 'lvjusd', 'label': 'LVJUSD'}
 ]
